@@ -16,9 +16,9 @@ export class Printer implements Visitor<string> {
 		return expr.name;
 	}
 	visitBinaryExpr(expr: BinaryExpr): string {
-		return `(${expr.left.visit(this)} ${expr.operator} ${expr.right.visit(
+		return `${expr.left.visit(this)} ${expr.operator} ${expr.right.visit(
 			this
-		)})`;
+		)}`;
 	}
 	visitUnaryExpr(expr: UnaryExpr): string {
 		return `${expr.operator}${expr.operand.visit(this)}`;

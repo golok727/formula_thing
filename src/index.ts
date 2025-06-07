@@ -10,7 +10,7 @@ import { FormulaRuntime } from "./runtime.js";
 let source1 = new MockDataSource({
 	Age: {
 		"1": 20,
-		"2": 18,
+		"2": 12,
 	},
 	Name: {
 		"1": "Alice",
@@ -65,15 +65,25 @@ class RowEnvironment extends Environment {
 }
 
 const src = `
-if(prop("Age") >= 18, "Adult", "Minor")
+if(
+		prop("Age") >= 18,
+		prop("Name") + " is " + "Adult", 
+		prop("Name") + " is " + "Minor"
+)
 `.trim();
 
 // gives functions like `if`..
 let rt = new FormulaRuntime();
-
+rt.define({
+	type: "function",
+	linkname: "now",
+	description: "Returns the current date and time",
+	fn: () => {
+		return new StringValue(new Date().toDateString());
+	},
+});
 // for each database create a new environment
 let sourceEnv = new DataViewFormulaEnvironment(source1);
-
 const [formula, errors] = new Formula("Test Formula", src).compileSafe();
 if (errors) {
 	throw new Error(`Compilation errors: ${errors.join(", ")}`);
