@@ -5,6 +5,7 @@ import {
 	type EnvDefineConfig,
 } from "./language/index.js";
 import { BooleanValue, NumberValue, StringValue } from "./language/value.js";
+import { Lexer } from "./parser/lexer.js";
 import { FormulaRuntime } from "./runtime.js";
 
 let source1 = new MockDataSource({
@@ -66,12 +67,23 @@ class RowEnvironment extends Environment {
 
 const src = `
  if(
-		prop("Age") >= 18, 
+		prop("Age") >= 1810e-10, 
 		concat(prop("Name"), " is ", "Adult"), 
 		concat(prop("Name"), " is ", "Minor")
  ) 
 `.trim();
 
+const lexer = new Lexer(src);
+const tokens = [];
+while (true) {
+	const token = lexer.next();
+	if (!token) {
+		break;
+	}
+	tokens.push(token);
+}
+
+console.log(tokens);
 // gives functions like `if`..
 let rt = new FormulaRuntime();
 rt.define({

@@ -1,0 +1,302 @@
+import { span, type SrcSpan } from "../span.js";
+import { Cursor } from "./cursor.js";
+import { Token, TokenKind, tryGetKeywordFromString } from "./token.js";
+
+const NUMBER_VALIDATOR =
+	/^(?:0[xX][0-9a-fA-F]+|0[bB][01]+|0[oO][0-7]+|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?|\d+)$/;
+
+export class Lexer {
+	private chars: Cursor<string>;
+
+	constructor(public readonly source: string) {
+		this.chars = new Cursor(source.split(""));
+	}
+
+	/* PARSE NAME BEGIN*/
+	private _isNameStart(c: string): boolean {
+		return /^[a-zA-Z_]$/.test(c);
+	}
+
+	private _isNameContinuation(c?: string): boolean {
+		return c !== undefined && /^[a-zA-Z0-9_]$/.test(c);
+	}
+
+	private _parseNameOrKeyword(startPos: number): TokenKind {
+		while (this._isNameContinuation(this.chars.peek())) {
+			this.chars.next();
+		}
+		let nameOrKeyword = this.source.slice(startPos, this.offset);
+		const keyword = tryGetKeywordFromString(nameOrKeyword);
+		return keyword ?? TokenKind.Ident;
+	}
+	/**PARSE NAME END */
+
+	private _isWhitespace(c?: string): boolean {
+		return c === " " || c === "\t" || c === "\n" || c === "\r";
+	}
+
+	private skipWhitespace(): void {
+		while (this._isWhitespace(this.chars.peek())) {
+			this.chars.next();
+		}
+	}
+
+	/* Parse number begin */
+	private _isNumberStart(c: string): boolean {
+		return /^[0-9]$/.test(c);
+	}
+
+	private _consumeHexNumber() {
+		for (;;) {
+			let nextHex = this.chars.peek();
+			if (nextHex === undefined || !/[0-9a-fA-F]/.test(nextHex)) break;
+			this.chars.next(); // consume the character
+		}
+	}
+
+	private _consumeBinaryChars() {
+		for (;;) {
+			let nextBin = this.chars.peek();
+			if (nextBin === undefined || !/[01]/.test(nextBin)) break;
+			this.chars.next(); // consume the character
+		}
+	}
+	private _consumeOctalChars() {
+		for (;;) {
+			this.chars.next(); // consume the character
+			let nextOct = this.chars.peek();
+			if (nextOct === undefined || !/[0-7]/.test(nextOct)) break;
+		}
+	}
+
+	private _consumeDecimalChars() {
+		for (;;) {
+			let nextDec = this.chars.peek();
+			if (nextDec === undefined || !/[0-9]/.test(nextDec)) break;
+			this.chars.next(); // consume the character
+		}
+	}
+
+	private _parseNumberOfRadix(radix: 2 | 8 | 10 | 16): boolean {
+		const start = this.offset;
+		switch (radix) {
+			case 2:
+				this._consumeBinaryChars();
+				break;
+			case 8:
+				this._consumeOctalChars();
+				break;
+			case 10:
+				this._consumeDecimalChars();
+				break;
+			case 16:
+				this._consumeHexNumber();
+				break;
+			default:
+				throw new Error(`Unsupported radix: ${radix}`);
+		}
+		return this.offset !== start;
+	}
+
+	private _consumeDecimalPart() {
+		let hasDecimal = this._parseNumberOfRadix(10);
+
+		let next = this.chars.peek();
+		if (hasDecimal && next && /^[eE]$/.test(next)) {
+			this.chars.next(); // consume 'e' or 'E'
+			this._consumeExponentPart();
+		}
+	}
+
+	private _consumeExponentPart() {
+		let next = this.chars.peek();
+		if (next === "+" || next === "-") {
+			this.chars.next(); // consume the sign
+		}
+
+		if (!this._parseNumberOfRadix(10)) {
+			throw new Error(`Expected a exponent part ${this.offset}`);
+		}
+	}
+
+	private _parseDecimalNumber() {
+		this._parseNumberOfRadix(10);
+		let next = this.chars.peek();
+		if (next && /^[eE.]$/.test(next)) {
+			let next = this.chars.next()!; // consume 'e' or 'E' or '.'
+			if (next === ".") {
+				this._consumeDecimalPart();
+			} else {
+				this._consumeExponentPart();
+			}
+		}
+	}
+
+	private _parseNumber(char: string, start: number): TokenKind {
+		if (char === "0") {
+			const next = this.chars.peek();
+			if (next === "x" || next === "X") {
+				this.chars.next(); // consume the 'x' or 'X'
+				if (!this._parseNumberOfRadix(16)) {
+					throw new Error(`Invalid hexadecimal number at position ${start}`);
+				}
+			} else if (next === "b" || next === "B") {
+				this.chars.next(); // consume the 'b' or 'B'
+				if (!this._parseNumberOfRadix(2)) {
+					throw new Error(`Invalid binary number at position ${start}`);
+				}
+			} else if (next === "o" || next === "O") {
+				this.chars.next(); // consume the 'o' or 'O'
+				if (!this._parseNumberOfRadix(8)) {
+					throw new Error(`Invalid octal number at position ${start}`);
+				}
+			} else {
+				this._parseDecimalNumber();
+			}
+		} else {
+			this._parseDecimalNumber();
+		}
+
+		let end = this.offset;
+		let numStr = this.source.slice(start, end);
+		if (!NUMBER_VALIDATOR.test(numStr)) {
+			throw new Error(
+				`Invalid number format at position ${start}: '${numStr}'`
+			);
+		}
+		return TokenKind.Number;
+	}
+	/* Parse number end */
+
+	private _eatQuotedString(quoteChar: string, start: number): TokenKind {
+		for (;;) {
+			let next = this.chars.peek();
+			if (next === undefined) {
+				throw new Error(`Unterminated string starting at position ${start}`);
+			}
+			if (next === quoteChar) {
+				this.chars.next(); // consume the closing quote
+				return TokenKind.String;
+			} else {
+				// todo should we allow multi-line strings?
+				this.chars.next(); // consume the character
+			}
+		}
+	}
+
+	private _parseSingleChar(c: string, start: number): TokenKind {
+		switch (c) {
+			case "+":
+				return TokenKind.Plus;
+			case "-":
+				return TokenKind.Minus;
+			case "*":
+				return TokenKind.Star;
+			case "/":
+				return TokenKind.Slash;
+			case "%":
+				return TokenKind.Modulo;
+			case "\\":
+				return TokenKind.BackSlash;
+			case "(":
+				return TokenKind.OpenParen;
+			case ")":
+				return TokenKind.CloseParen;
+			case "[":
+				return TokenKind.OpenBracket;
+			case "]":
+				return TokenKind.CloseBracket;
+			case ",":
+				return TokenKind.Comma;
+			case ".":
+				return TokenKind.Dot;
+			case "<": {
+				const next = this.chars.peek();
+				if (next === "=") {
+					this.chars.next(); // consume the next '='
+					return TokenKind.LtEq;
+				}
+				return TokenKind.Lt;
+			}
+			case ">": {
+				const next = this.chars.peek();
+				if (next === "=") {
+					this.chars.next(); // consume the next '='
+					return TokenKind.GtEq;
+				}
+				return TokenKind.Gt;
+			}
+			case "=": {
+				const next = this.chars.peek();
+				if (next === "=") {
+					this.chars.next(); // consume the next '='
+					return TokenKind.EqEq;
+				}
+				throw new Error(`Unexpected character ${c} at position ${start}`);
+			}
+			case "!": {
+				const next = this.chars.peek();
+				if (next === "=") {
+					this.chars.next(); // consume the next '='
+					return TokenKind.NotEq;
+				}
+				return TokenKind.Not;
+			}
+			case ".": {
+				const next = this.chars.peek();
+				if (next && this._isNumberStart(next)) {
+					this.chars.next(); // consume the next character
+					throw new Error("Unimplemented: Number parsing with decimal point");
+				}
+				return TokenKind.Dot;
+			}
+			case "'":
+			case '"': {
+				return this._eatQuotedString(c, start);
+			}
+			default: {
+				return TokenKind.Unknown;
+			}
+		}
+	}
+
+	private nextKind(): [TokenKind, SrcSpan] {
+		const start = this.offset;
+		const c = this.chars.next();
+		if (c === undefined) {
+			return [TokenKind.Eof, span(start, this.offset)];
+		}
+		let kind: TokenKind = TokenKind.Unknown;
+
+		if (this._isNameStart(c)) {
+			kind = this._parseNameOrKeyword(start);
+		} else if (this._isWhitespace(c)) {
+			this.skipWhitespace();
+			return this.nextKind();
+		} else if (this._isNumberStart(c)) {
+			kind = this._parseNumber(c, start);
+		} else {
+			kind = this._parseSingleChar(c, start);
+		}
+
+		const end = this.offset;
+
+		if (kind === TokenKind.Unknown) {
+			throw new Error(`Unexpected character '${c}' at position ${start}`);
+		}
+
+		return [kind!, span(start, end)];
+	}
+
+	next(): Token | null {
+		const [kind, span] = this.nextKind();
+		if (kind === TokenKind.Eof) {
+			return null;
+		}
+		return new Token(kind, span);
+	}
+
+	get offset(): number {
+		return this.source.length - this.chars.remaining;
+	}
+}
