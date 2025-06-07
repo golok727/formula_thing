@@ -7,10 +7,6 @@ import {
 import { BooleanValue, NumberValue, StringValue } from "./language/value.js";
 import { FormulaRuntime } from "./runtime.js";
 
-const src = `
-if(prop("Age") >= 18, "Adult", "Minor")
-`.trim();
-
 let source1 = new MockDataSource({
 	Age: {
 		"1": 20,
@@ -67,6 +63,10 @@ class RowEnvironment extends Environment {
 		}
 	};
 }
+
+const src = `
+if(prop("Age") >= 18, "Adult", "Minor")
+`.trim();
 
 // gives functions like `if`..
 let rt = new FormulaRuntime();

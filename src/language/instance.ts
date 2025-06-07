@@ -71,7 +71,7 @@ class ValueEvaluator implements Visitor<Value> {
 				}
 				if (left instanceof StringValue && right instanceof StringValue) {
 					return new StringValue(left.value + right.value);
-				} else return new StringValue(`${left.toString()}${right.toString()}`);
+				} else return new StringValue(`${left.asString()}${right.asString()}`);
 			case "-":
 				return new NumberValue(left.asNumber() - right.asNumber());
 			case "*":

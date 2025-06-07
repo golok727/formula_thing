@@ -23,11 +23,15 @@ export class Formula implements Visit {
 	}
 
 	compile(): this {
-		this._root = SAMPLE_FORMULA;
+		const errors = this.compileSafe()[1];
+		if (errors) {
+			throw new Error(`Compilation failed: ${errors.join(", ")}`);
+		}
 		return this;
 	}
 
 	compileSafe(): CompilationResult {
+		// todo parse the source code here
 		this._root = SAMPLE_FORMULA;
 		return [this, null];
 	}

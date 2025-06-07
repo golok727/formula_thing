@@ -23,15 +23,15 @@ import { span } from "./span.js";
 // 	span(0, 0)
 // );
 
-function b(left: Expr, operator: BinaryOp, right: Expr) {
+function $b(left: Expr, operator: BinaryOp, right: Expr) {
 	return new BinaryExpr(left, operator, right, span(0, 0));
 }
 
 function someoneIs(suffix: Expr) {
-	return b(prop("Name"), "+", b(str(" is "), "+", suffix));
+	return $b($prop("Name"), "+", $b($str(" is "), "+", suffix));
 }
 
-function prop(name: string) {
+function $prop(name: string) {
 	return new CallExpr(
 		new Ident("prop", span(0, 0)),
 		[new LiteralExpr(name, span(0, 0))],
@@ -39,28 +39,34 @@ function prop(name: string) {
 	);
 }
 
-function num(value: number) {
+function $num(value: number) {
 	return new LiteralExpr(value, span(0, 0));
 }
-function str(value: string) {
+function $str(value: string) {
 	return new LiteralExpr(value, span(0, 0));
 }
-function bool(value: boolean) {
+function $bool(value: boolean) {
 	return new LiteralExpr(value, span(0, 0));
 }
 
-export const SAMPLE_FORMULA = new CallExpr(
-	new Ident("if", span(0, 0)),
-	[
-		b(prop("Age"), ">=", num(18)),
-		// someoneIs(prop("Name")),
-		// someoneIs(prop("Name")),
-		someoneIs(str("Adult")),
-		someoneIs(str("Minor")),
-		// str("Adult"),
-		// str("Minor"),
-	],
-	span(0, 0)
+function $if(condition: Expr, trueExpr: Expr, falseExpr: Expr) {
+	return new CallExpr(
+		new Ident("if", span(0, 0)),
+		[condition, trueExpr, falseExpr],
+		span(0, 0)
+	);
+}
+
+// export const SAMPLE_FORMULA = $b($prop("Name"), "+", $prop("Age"));
+
+export const SAMPLE_FORMULA = $if(
+	$b($prop("Age"), ">=", $num(18)),
+	someoneIs($str("Adult")),
+	someoneIs($str("Minor"))
+	// someoneIs(prop("Name")),
+	// someoneIs(prop("Name")),
+	// str("Adult"),
+	// str("Minor"),
 );
 
 export type CellValue = string | number | boolean | null;
