@@ -60,18 +60,18 @@ export class Environment {
 	createInstance(formula: Formula): Instance<this>;
 	createInstance(
 		formula: Formula,
-		instanceEnv?: Environment
+		envOverride?: Environment
 	): Instance<Environment> {
-		if (instanceEnv) {
-			let curRoot = instanceEnv;
+		if (envOverride) {
+			let curRoot = envOverride;
 			while (curRoot && curRoot.parent) {
 				if (curRoot === this) {
-					return new Instance(formula, instanceEnv);
+					return new Instance(formula, envOverride);
 				}
 				curRoot = curRoot.parent;
 			}
 			curRoot.setParent(this);
-			return new Instance(formula, instanceEnv);
+			return new Instance(formula, envOverride);
 		} else {
 			return new Instance(formula, this);
 		}
