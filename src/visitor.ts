@@ -17,5 +17,5 @@ export interface Visitor<Result = unknown> {
 }
 
 export interface Visit {
-	visit<Result = unknown>(visitor: Visitor<Result>): Result;
+	visit<Result>(visitor: Visitor<Result>): Result;
 }

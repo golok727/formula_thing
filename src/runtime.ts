@@ -1,23 +1,19 @@
-import { Engine } from "./language/engine.ts";
-import { Environment } from "./language/environment.ts";
-import type { EnvDefineConfig } from "./language/types.ts";
+import { Environment } from "./language/environment.js";
+import type { EnvDefineConfig } from "./language/types.js";
 
-export class FormulaRuntime extends Engine {
+export class FormulaRuntime extends Environment {
 	constructor() {
-		const env = new GlobalEnvironment();
-
-		env.define({
+		super(null);
+		this.define({
 			type: "function",
 			linkname: "if",
 			description:
 				"Conditional function that executes one of two branches based on a condition. \n\nUsage: `if(condition, trueBranch, falseBranch)`",
 			fn: FormulaRuntime._if,
 		});
-
-		super(env);
 	}
 
-	private static _if: EnvDefineConfig<GlobalEnvironment>["fn"] = (_, args) => {
+	private static _if: EnvDefineConfig<FormulaRuntime>["fn"] = (_, args) => {
 		const condition = args.get(0).asBoolean();
 		const trueBranch = args.get(1);
 		const falseBranch = args.get(2);
@@ -27,10 +23,4 @@ export class FormulaRuntime extends Engine {
 			return falseBranch;
 		}
 	};
-}
-
-export class GlobalEnvironment extends Environment {
-	constructor() {
-		super(null);
-	}
 }

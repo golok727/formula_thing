@@ -5,7 +5,7 @@ import type { Visit, Visitor } from "./visitor.js";
 export abstract class Expr implements Visit {
 	constructor(public readonly span: SrcSpan) {}
 
-	abstract visit<Result = unknown>(visitor: Visitor<Result>): Result;
+	abstract visit<Result>(visitor: Visitor<Result>): Result;
 
 	toString(): string {
 		return this.visit(new Printer());
@@ -17,7 +17,7 @@ export class LiteralExpr extends Expr {
 		super(span);
 	}
 
-	visit<Result = unknown>(visitor: Visitor<Result>): Result {
+	visit<Result>(visitor: Visitor<Result>): Result {
 		return visitor.visitLiteralExpr(this);
 	}
 }
@@ -27,7 +27,7 @@ export class Ident extends Expr {
 		super(span);
 	}
 
-	visit<Result = unknown>(visitor: Visitor<Result>): Result {
+	visit<Result>(visitor: Visitor<Result>): Result {
 		return visitor.visitIdent(this);
 	}
 }
@@ -59,7 +59,7 @@ export class BinaryExpr extends Expr {
 		super(span);
 	}
 
-	visit<Result = unknown>(visitor: Visitor<Result>): Result {
+	visit<Result>(visitor: Visitor<Result>): Result {
 		return visitor.visitBinaryExpr(this);
 	}
 }
@@ -73,7 +73,7 @@ export class UnaryExpr extends Expr {
 		super(span);
 	}
 
-	visit<Result = unknown>(visitor: Visitor<Result>): Result {
+	visit<Result>(visitor: Visitor<Result>): Result {
 		return visitor.visitUnaryExpr(this);
 	}
 }
@@ -87,7 +87,7 @@ export class CallExpr extends Expr {
 		super(span);
 	}
 
-	visit<Result = unknown>(visitor: Visitor<Result>): Result {
+	visit<Result>(visitor: Visitor<Result>): Result {
 		return visitor.visitCallExpr(this);
 	}
 }
@@ -101,7 +101,7 @@ export class MemberExpr extends Expr {
 		super(span);
 	}
 
-	visit<Result = unknown>(visitor: Visitor<Result>): Result {
+	visit<Result>(visitor: Visitor<Result>): Result {
 		return visitor.visitMemberExpr(this);
 	}
 }
