@@ -50,7 +50,9 @@ export class Environment {
 		return this;
 	}
 
-	// Create an instance with this environment available
+	/**
+	 * Create an instance providing this environment:
+	 */
 	createInstance<Env extends Environment>(
 		formula: Formula,
 		instanceEnv: Env
@@ -61,11 +63,14 @@ export class Environment {
 		instanceEnv?: Environment
 	): Instance<Environment> {
 		if (instanceEnv) {
-			let topMostParent = instanceEnv;
-			while (topMostParent && topMostParent.parent) {
-				topMostParent = topMostParent.parent;
+			let curRoot = instanceEnv;
+			while (curRoot && curRoot.parent) {
+				if (curRoot === this) {
+					return new Instance(formula, instanceEnv);
+				}
+				curRoot = curRoot.parent;
 			}
-			topMostParent.setParent(this);
+			curRoot.setParent(this);
 			return new Instance(formula, instanceEnv);
 		} else {
 			return new Instance(formula, this);
