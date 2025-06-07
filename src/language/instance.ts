@@ -55,7 +55,7 @@ class ValueEvaluator implements Visitor<Value> {
 		}
 	}
 
-	visitIdent(expr: Ident): Value {
+	visitIdent(_: Ident): Value {
 		throw new Error(
 			"Method not implemented. Identifiers should be resolved in the environment."
 		);
@@ -76,6 +76,8 @@ class ValueEvaluator implements Visitor<Value> {
 				return new NumberValue(left.asNumber() - right.asNumber());
 			case "*":
 				return new NumberValue(left.asNumber() * right.asNumber());
+			case "%":
+				return new NumberValue(left.asNumber() % right.asNumber());
 			case "/":
 				return new NumberValue(left.asNumber() / right.asNumber());
 			case "<":

@@ -38,6 +38,14 @@ export class Lexer implements Iterable<Token> {
 		return new Token(kind, span);
 	}
 
+	next(): Token | null {
+		const token = this.nextToken();
+		if (token.kind === TokenKind.Eof) {
+			return null;
+		}
+		return token;
+	}
+
 	private _nextKind(): [TokenKind, SrcSpan] {
 		const start = this.offset;
 		const c = this.chars.next();

@@ -67,7 +67,7 @@ class RowEnvironment extends Environment {
 
 const src = `
  if(
-		prop("Age") >= 1810e-10, 
+		prop("Age") >= 18, 
 		concat(prop("Name"), " is ", "Adult"), 
 		concat(prop("Name"), " is ", "Minor")
  ) 
@@ -93,8 +93,8 @@ if (errors) {
 	throw new Error(`Compilation errors: ${errors.join(", ")}`);
 }
 // each cell can have its own instance of the formula
-const i1 = rt.createInstance(formula, new RowEnvironment("1", sourceEnv));
-const i2 = rt.createInstance(formula, new RowEnvironment("2", sourceEnv));
+const row1 = rt.createInstance(formula, new RowEnvironment("1", sourceEnv));
+const row2 = rt.createInstance(formula, new RowEnvironment("2", sourceEnv));
 
-console.log(i1.eval().asString());
-console.log(i2.eval().asString());
+console.log(row1.eval().asString());
+console.log(row2.eval().asString());
