@@ -74,16 +74,8 @@ const src = `
 `.trim();
 
 const lexer = new Lexer(src);
-const tokens = [];
-while (true) {
-	const token = lexer.next();
-	if (!token) {
-		break;
-	}
-	tokens.push(token);
-}
-
-console.log(tokens);
+const tokens = [...lexer].map((t) => t.toString());
+console.log(tokens.join("\n"));
 // gives functions like `if`..
 let rt = new FormulaRuntime();
 rt.define({

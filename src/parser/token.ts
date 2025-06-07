@@ -61,4 +61,7 @@ export class Token {
 	source(src: string): string {
 		return src.slice(this.span.start, this.span.end);
 	}
+	toString(): string {
+		return `Token(kind = '${this.kind}')`;
+	}
 }

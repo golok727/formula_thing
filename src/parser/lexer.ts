@@ -5,11 +5,65 @@ import { Token, TokenKind, tryGetKeywordFromString } from "./token.js";
 const NUMBER_VALIDATOR =
 	/^(?:0[xX][0-9a-fA-F]+|0[bB][01]+|0[oO][0-7]+|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?|\d+)$/;
 
-export class Lexer {
+export class Lexer implements Iterable<Token> {
 	private chars: Cursor<string>;
 
 	constructor(public readonly source: string) {
 		this.chars = new Cursor(source.split(""));
+	}
+
+	/**
+	 * 	Creates a clone of the lexer with the same source and character cursor.
+	 */
+	clone(): Lexer {
+		const clone = new Lexer(this.source);
+		clone.chars = this.chars.clone();
+		return clone;
+	}
+
+	[Symbol.iterator](): Iterator<Token, any, any> {
+		return {
+			next: () => {
+				const token = this.nextToken();
+				return {
+					value: token,
+					done: token.kind === TokenKind.Eof,
+				};
+			},
+		};
+	}
+
+	nextToken(): Token {
+		const [kind, span] = this._nextKind();
+		return new Token(kind, span);
+	}
+
+	private _nextKind(): [TokenKind, SrcSpan] {
+		const start = this.offset;
+		const c = this.chars.next();
+		if (c === undefined) {
+			return [TokenKind.Eof, span(start, this.offset)];
+		}
+		let kind: TokenKind = TokenKind.Unknown;
+
+		if (this._isNameStart(c)) {
+			kind = this._parseNameOrKeyword(start);
+		} else if (this._isWhitespace(c)) {
+			this.skipWhitespace();
+			return this._nextKind();
+		} else if (this._isNumberStart(c)) {
+			kind = this._parseNumber(c, start);
+		} else {
+			kind = this._parseSingleChar(c, start);
+		}
+
+		const end = this.offset;
+
+		if (kind === TokenKind.Unknown) {
+			throw new Error(`Unexpected character '${c}' at position ${start}`);
+		}
+
+		return [kind!, span(start, end)];
 	}
 
 	/* PARSE NAME BEGIN*/
@@ -260,43 +314,7 @@ export class Lexer {
 		}
 	}
 
-	private nextKind(): [TokenKind, SrcSpan] {
-		const start = this.offset;
-		const c = this.chars.next();
-		if (c === undefined) {
-			return [TokenKind.Eof, span(start, this.offset)];
-		}
-		let kind: TokenKind = TokenKind.Unknown;
-
-		if (this._isNameStart(c)) {
-			kind = this._parseNameOrKeyword(start);
-		} else if (this._isWhitespace(c)) {
-			this.skipWhitespace();
-			return this.nextKind();
-		} else if (this._isNumberStart(c)) {
-			kind = this._parseNumber(c, start);
-		} else {
-			kind = this._parseSingleChar(c, start);
-		}
-
-		const end = this.offset;
-
-		if (kind === TokenKind.Unknown) {
-			throw new Error(`Unexpected character '${c}' at position ${start}`);
-		}
-
-		return [kind!, span(start, end)];
-	}
-
-	next(): Token | null {
-		const [kind, span] = this.nextKind();
-		if (kind === TokenKind.Eof) {
-			return null;
-		}
-		return new Token(kind, span);
-	}
-
-	get offset(): number {
+	private get offset(): number {
 		return this.source.length - this.chars.remaining;
 	}
 }
