@@ -4,7 +4,6 @@ import {
 	Expr,
 	Ident,
 	LiteralExpr,
-	MemberExpr,
 	type BinaryOp,
 } from "./ast.js";
 import { span } from "./span.js";
@@ -23,15 +22,24 @@ import { span } from "./span.js";
 // 	span(0, 0)
 // );
 
-function $b(left: Expr, operator: BinaryOp, right: Expr) {
+export function $b(left: Expr, operator: BinaryOp, right: Expr) {
 	return new BinaryExpr(left, operator, right, span(0, 0));
 }
 
-function someoneIs(suffix: Expr) {
-	return $b($prop("Name"), "+", $b($str(" is "), "+", suffix));
+export function $concat(...expr: Expr[]) {
+	return new CallExpr(new Ident("concat", span(0, 0)), expr, span(0, 0));
 }
 
-function $prop(name: string) {
+function someoneIs(suffix: Expr) {
+	// return $b($prop("Name"), "+", $b($str(" is "), "+", suffix));
+	return $concat($prop("Name"), $str(" is "), suffix);
+}
+
+export function $now() {
+	return new CallExpr(new Ident("now", span(0, 0)), [], span(0, 0));
+}
+
+export function $prop(name: string) {
 	return new CallExpr(
 		new Ident("prop", span(0, 0)),
 		[new LiteralExpr(name, span(0, 0))],
@@ -39,17 +47,17 @@ function $prop(name: string) {
 	);
 }
 
-function $num(value: number) {
+export function $num(value: number) {
 	return new LiteralExpr(value, span(0, 0));
 }
-function $str(value: string) {
+export function $str(value: string) {
 	return new LiteralExpr(value, span(0, 0));
 }
-function $bool(value: boolean) {
+export function $bool(value: boolean) {
 	return new LiteralExpr(value, span(0, 0));
 }
 
-function $if(condition: Expr, trueExpr: Expr, falseExpr: Expr) {
+export function $if(condition: Expr, trueExpr: Expr, falseExpr: Expr) {
 	return new CallExpr(
 		new Ident("if", span(0, 0)),
 		[condition, trueExpr, falseExpr],
@@ -57,6 +65,7 @@ function $if(condition: Expr, trueExpr: Expr, falseExpr: Expr) {
 	);
 }
 
+// export const SAMPLE_FORMULA = $now();
 // export const SAMPLE_FORMULA = $b($prop("Name"), "+", $prop("Age"));
 
 export const SAMPLE_FORMULA = $if(

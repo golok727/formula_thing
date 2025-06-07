@@ -1,7 +1,11 @@
 import { None, type Value } from "./value.js";
 
 export class Arguments {
-	constructor(private readonly args: Value[]) {}
+	constructor(public readonly args: Value[]) {}
+
+	get length(): number {
+		return this.args.length;
+	}
 
 	get(index: number): Value {
 		if (index < 0 || index >= this.args.length) {

@@ -34,7 +34,7 @@ export class Environment {
 			null) as never;
 	}
 
-	define(def: EnvDefineConfig<this>): void {
+	define(def: EnvDefineConfig<this>): this {
 		if (def.type === "function") {
 			if (this._functions.has(def.linkname)) {
 				throw new Error(
@@ -46,6 +46,8 @@ export class Environment {
 				new Fn(def as EnvDefineConfig, this) as never as Fn
 			);
 		}
+
+		return this;
 	}
 
 	// Create an instance with this environment available
