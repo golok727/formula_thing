@@ -304,6 +304,12 @@ export class Lexer implements Iterable<Token> {
 				}
 				return TokenKind.Dot;
 			}
+			case "?": {
+				return TokenKind.Question;
+			}
+			case ":": {
+				return TokenKind.Colon;
+			}
 			case "'":
 			case '"': {
 				return this._eatQuotedString(c, start);

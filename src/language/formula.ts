@@ -4,7 +4,7 @@ import type { Visit, Visitor } from "../visitor.ts";
 
 export type CompilationResult =
 	| [formula: Formula, errors: null]
-	| [null, errors: string[]];
+	| [null, errors: unknown[]];
 
 export class Formula implements Visit {
 	private _root: Expr | null = null;
