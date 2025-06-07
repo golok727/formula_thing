@@ -1,11 +1,12 @@
 import type { Visitor } from "./visitor.js";
-import type {
+import {
 	BinaryExpr,
 	CallExpr,
-	Ident,
-	LiteralExpr,
-	MemberExpr,
 	UnaryExpr,
+	type Expr,
+	type Ident,
+	type LiteralExpr,
+	type MemberExpr,
 } from "./ast.js";
 
 export class Printer implements Visitor<string> {

@@ -36,7 +36,7 @@ export class Formula implements Visit {
 		return [this, null];
 	}
 
-	toString(): string {
-		return this._root?.toString() ?? "<not compiled>";
+	toString(pretty?: boolean): string {
+		return this._root?.toString(pretty) ?? "<not compiled>";
 	}
 }

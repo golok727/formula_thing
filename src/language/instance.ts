@@ -34,7 +34,7 @@ export class Instance<Env extends Environment = Environment> {
 	}
 
 	eval() {
-		console.log("Evaluating formula:", this.formula.toString());
+		console.log(this.formula.toString());
 		const evaluator = new ValueEvaluator(this.environment);
 		return this.formula.visit(evaluator);
 	}

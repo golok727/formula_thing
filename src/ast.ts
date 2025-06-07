@@ -7,7 +7,7 @@ export abstract class Expr implements Visit {
 
 	abstract visit<Result>(visitor: Visitor<Result>): Result;
 
-	toString(): string {
+	toString(_pretty: boolean = false): string {
 		return this.visit(new Printer());
 	}
 }
