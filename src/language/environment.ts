@@ -55,7 +55,7 @@ export class Environment {
 		formula: Formula,
 		instanceEnv: Env
 	): Instance<Env>;
-	createInstance(formula: Formula): Instance;
+	createInstance(formula: Formula): Instance<this>;
 	createInstance(
 		formula: Formula,
 		instanceEnv?: Environment
