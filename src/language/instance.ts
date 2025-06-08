@@ -14,8 +14,12 @@ import {
 	BooleanValue,
 	None,
 	NumberValue,
+	AddTrait,
 	StringValue,
 	type Value,
+	SubTrait,
+	MulTrait,
+	DivTrait,
 } from "./core/index.js";
 
 export class Instance<Env extends Environment = Environment> {
@@ -70,20 +74,15 @@ class SimpleInterpreter implements Visitor<Value> {
 		const right = expr.right.visit(this);
 		switch (expr.operator) {
 			case "+":
-				if (left instanceof NumberValue && right instanceof NumberValue) {
-					return new NumberValue(left.value + right.value);
-				}
-				if (left instanceof StringValue && right instanceof StringValue) {
-					return new StringValue(left.value + right.value);
-				} else return new StringValue(`${left.asString()}${right.asString()}`);
+				return left.getImpl(AddTrait).add(left, right);
 			case "-":
-				return new NumberValue(left.asNumber() - right.asNumber());
+				return left.getImpl(SubTrait).sub(left, right);
 			case "*":
-				return new NumberValue(left.asNumber() * right.asNumber());
+				return left.getImpl(MulTrait).mul(left, right);
+			case "/":
+				return left.getImpl(DivTrait).div(left, right);
 			case "%":
 				return new NumberValue(left.asNumber() % right.asNumber());
-			case "/":
-				return new NumberValue(left.asNumber() / right.asNumber());
 			case "<":
 				return new BooleanValue(left.asNumber() < right.asNumber());
 			case ">":

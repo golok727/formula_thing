@@ -1,4 +1,13 @@
-import { OpAdd, OpDiv, OpMul, OpSub, type OpAddTrait } from "../op.js";
+import {
+	AddTrait,
+	DivTrait,
+	MulTrait,
+	SubTrait,
+	type Add,
+	type Div,
+	type Mul,
+	type Sub,
+} from "../op.js";
 import { BaseValue, type Value } from "../value.js";
 import { NumberValue } from "./number.js";
 
@@ -26,25 +35,25 @@ export class BooleanValue extends BaseValue {
 	}
 }
 
-BooleanValue.addImpl(OpAdd, {
+BooleanValue.addImpl<Add<BooleanValue>>(AddTrait, {
 	add: (me, other): Value => {
 		return new NumberValue(me.asNumber() + other.asNumber());
 	},
 });
 
-BooleanValue.addImpl(OpSub, {
+BooleanValue.addImpl<Sub<BooleanValue>>(SubTrait, {
 	sub: (me, other): Value => {
 		return new NumberValue(me.asNumber() - other.asNumber());
 	},
 });
 
-BooleanValue.addImpl(OpMul, {
+BooleanValue.addImpl<Mul<BooleanValue>>(MulTrait, {
 	mul: (me, other): Value => {
 		return new NumberValue(me.asNumber() * other.asNumber());
 	},
 });
 
-BooleanValue.addImpl(OpDiv, {
+BooleanValue.addImpl<Div<BooleanValue>>(DivTrait, {
 	div: (me, other): Value => {
 		if (other.asNumber() === 0) {
 			return new NumberValue(NaN);

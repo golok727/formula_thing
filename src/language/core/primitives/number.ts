@@ -1,4 +1,14 @@
-import { BaseValue } from "../value.js";
+import {
+	AddTrait,
+	DivTrait,
+	MulTrait,
+	SubTrait,
+	type Add,
+	type Div,
+	type Mul,
+	type Sub,
+} from "../op.js";
+import { BaseValue, type Value } from "../value.js";
 
 export class NumberValue extends BaseValue {
 	readonly typeHint: string = "Number";
@@ -23,3 +33,30 @@ export class NumberValue extends BaseValue {
 		return false;
 	}
 }
+
+NumberValue.addImpl<Add<NumberValue>>(AddTrait, {
+	add: (me, other): Value => {
+		if (other instanceof NumberValue) {
+			return new NumberValue(me.value + other.value);
+		}
+		return other.getImpl(AddTrait).add(me, other);
+	},
+});
+
+NumberValue.addImpl<Sub<NumberValue>>(SubTrait, {
+	sub: (me, other): NumberValue => {
+		return new NumberValue(me.asNumber() - other.asNumber());
+	},
+});
+
+NumberValue.addImpl<Mul<NumberValue>>(MulTrait, {
+	mul: (me, other): NumberValue => {
+		return new NumberValue(me.asNumber() * other.asNumber());
+	},
+});
+
+NumberValue.addImpl<Div<NumberValue>>(DivTrait, {
+	div: (me, other): NumberValue => {
+		return new NumberValue(me.asNumber() + other.asNumber());
+	},
+});
