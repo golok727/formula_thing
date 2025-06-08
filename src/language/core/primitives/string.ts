@@ -1,7 +1,7 @@
 import { BaseValue } from "../value.js";
 
 export class StringValue extends BaseValue {
-	readonly typeHint: string = "string";
+	readonly typeHint: string = "String";
 
 	constructor(public value: string) {
 		super();

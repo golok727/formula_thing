@@ -1,8 +1,9 @@
-import { OpAddTraitId } from "../op.js";
+import { OpAdd, OpDiv, OpMul, OpSub, type OpAddTrait } from "../op.js";
 import { BaseValue, type Value } from "../value.js";
+import { NumberValue } from "./number.js";
 
 export class BooleanValue extends BaseValue {
-	readonly typeHint: string = "boolean";
+	readonly typeHint: string = "Boolean";
 
 	constructor(public value: boolean) {
 		super();
@@ -25,10 +26,29 @@ export class BooleanValue extends BaseValue {
 	}
 }
 
-BooleanValue.addImpl<BooleanValue>(OpAddTraitId, {
-	add: (me, args): Value => {
-		throw new Error(
-			"Boolean values do not support addition. Use logical operations instead."
-		);
+BooleanValue.addImpl(OpAdd, {
+	add: (me, other): Value => {
+		return new NumberValue(me.asNumber() + other.asNumber());
+	},
+});
+
+BooleanValue.addImpl(OpSub, {
+	sub: (me, other): Value => {
+		return new NumberValue(me.asNumber() - other.asNumber());
+	},
+});
+
+BooleanValue.addImpl(OpMul, {
+	mul: (me, other): Value => {
+		return new NumberValue(me.asNumber() * other.asNumber());
+	},
+});
+
+BooleanValue.addImpl(OpDiv, {
+	div: (me, other): Value => {
+		if (other.asNumber() === 0) {
+			return new NumberValue(NaN);
+		}
+		return new NumberValue(me.asNumber() / other.asNumber());
 	},
 });

@@ -1,6 +1,10 @@
 import { Arguments } from "../arguments.js";
-import { OpAddTraitId } from "./op.js";
-import { type Trait, type TraitDefinition } from "./trait.js";
+import { OpAdd, OpSub, type OpAddTrait } from "./op.js";
+import {
+	type ExtractTrait,
+	type Trait,
+	type TraitDefinition,
+} from "./trait.js";
 
 export interface Value {
 	// should be unique
@@ -9,10 +13,12 @@ export interface Value {
 	asBoolean(): boolean;
 	asNumber(): number;
 	isNone(): boolean;
+
+	getImpl<T extends Trait = Trait>(trait: TraitDefinition<T>): T;
 }
 
 export abstract class BaseValue implements Value {
-	static traits: Map<string, Trait> = new Map();
+	protected static traitMap: Map<string, Trait> = new Map();
 
 	abstract typeHint: string;
 	abstract asString(): string;
@@ -22,13 +28,9 @@ export abstract class BaseValue implements Value {
 
 	// add  this and other values together
 	// only use this if this has a trait implementation or it will throw an error
-	add(other: Value) {
-		const trait = this.getImpl(OpAddTraitId);
-		return trait.add(this, new Arguments([other]));
-	}
 
 	getImpl<T extends Trait = Trait>(trait: TraitDefinition<T>): T {
-		const impl = (this.constructor as typeof BaseValue).traits.get(trait.id);
+		const impl = (this.constructor as typeof BaseValue).traitMap.get(trait.id);
 		if (!impl) {
 			throw new Error(
 				`Trait ${trait.id} is not implemented for ${this.typeHint}.`
@@ -41,7 +43,7 @@ export abstract class BaseValue implements Value {
 		trait: TraitDefinition<T>,
 		access: (value: this, trait: T) => R
 	) {
-		const impl = (this.constructor as typeof BaseValue).traits.get(trait.id);
+		const impl = (this.constructor as typeof BaseValue).traitMap.get(trait.id);
 		if (!impl) {
 			throw new Error(
 				`Trait ${trait.id} is not implemented for ${this.typeHint}.`
@@ -50,14 +52,16 @@ export abstract class BaseValue implements Value {
 		return access(this, impl as T);
 	}
 
-	static addImpl<V extends Value = Value, T = Trait<V>>(
-		trait: TraitDefinition,
-		impl: T,
+	static addImpl<T extends TraitDefinition<any>>(
+		trait: T,
+		impl: ExtractTrait<T>,
 		replace?: boolean
 	) {
-		if (this.traits.has(trait.id) && !replace) {
+		if (this.traitMap.has(trait.id) && !replace) {
 			throw new Error(`Trait ${trait.id} is already defined.`);
 		}
-		this.traits.set(trait.id, impl as never);
+		this.traitMap.set(trait.id, impl as never);
 	}
 }
+
+type thing = ExtractTrait<TraitDefinition<OpAddTrait>>;
