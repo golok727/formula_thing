@@ -1,9 +1,10 @@
 import { Formula } from "./language/formula.js";
-import { StringValue } from "./language/index.js";
+import { Environment, StringValue, type Value } from "./language/index.js";
 import { FormulaRuntime } from "./runtime.js";
 
 import readline from "node:readline/promises";
 
+let running = true;
 const runtime = new FormulaRuntime();
 runtime.define({
 	type: "function",
@@ -13,6 +14,15 @@ runtime.define({
 		return new StringValue(new Date().toISOString());
 	},
 });
+runtime.define({
+	type: "function",
+	description: "Exit the REPL",
+	linkname: "exit",
+	fn: () => {
+		running = false;
+		return new StringValue("Exiting REPL...");
+	},
+});
 
 const rl = readline.createInterface({
 	input: process.stdin,
@@ -20,19 +30,26 @@ const rl = readline.createInterface({
 	terminal: true,
 });
 
-while (true) {
+while (running) {
 	const input = await rl.question("> ");
 	if (input.trim() === ".exit") break;
 	if (!input.trim()) continue;
 
 	try {
-		const formula = new Formula("input", input).compile();
-		const instance = runtime.createInstance(formula);
-		const result = instance.eval();
-		console.log(result.asString());
+		let res = evaluateFormula(input, runtime);
+		console.log(res.asString());
 	} catch (err) {
 		console.error("Error:", err);
 	}
 }
 
 rl.close();
+
+export function evaluateFormula(
+	source: string,
+	env: Environment = new FormulaRuntime()
+): Value {
+	const formula = new Formula(source, "Eval").compile();
+	const instance = env.createInstance(formula);
+	return instance.eval();
+}

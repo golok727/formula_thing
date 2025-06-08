@@ -13,7 +13,10 @@ export class CompilationError extends Error {
 export class Formula implements Visit {
 	private _root: Expr | null = null;
 
-	constructor(public readonly name: string, public readonly source: string) {}
+	constructor(
+		public readonly source: string,
+		public readonly name: string = "Unnamed formula"
+	) {}
 
 	visit<Result = unknown>(visitor: Visitor<Result>): Result {
 		if (!this._root) {

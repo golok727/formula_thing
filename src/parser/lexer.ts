@@ -164,10 +164,12 @@ export class Lexer implements Iterable<Token> {
 		let hasDecimal = this._parseNumberOfRadix(10);
 
 		let next = this.chars.peek();
+
 		if (hasDecimal && next && /^[eE]$/.test(next)) {
 			this.chars.next(); // consume 'e' or 'E'
 			this._consumeExponentPart();
 		}
+		return hasDecimal;
 	}
 
 	private _consumeExponentPart() {
@@ -270,8 +272,6 @@ export class Lexer implements Iterable<Token> {
 				return TokenKind.RBracket;
 			case ",":
 				return TokenKind.Comma;
-			case ".":
-				return TokenKind.Dot;
 			case "&": {
 				const next = this.chars.peek();
 				if (next === "&") {
@@ -323,8 +323,8 @@ export class Lexer implements Iterable<Token> {
 			case ".": {
 				const next = this.chars.peek();
 				if (next && this._isNumberStart(next)) {
-					this.chars.next(); // consume the next character
-					throw new Error("Unimplemented: Number parsing with decimal point");
+					this._consumeDecimalPart();
+					return TokenKind.Number;
 				}
 				return TokenKind.Dot;
 			}

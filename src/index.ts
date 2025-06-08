@@ -5,6 +5,7 @@ import {
 	type EnvDefineConfig,
 } from "./language/index.js";
 import { BooleanValue, NumberValue, StringValue } from "./language/value.js";
+import { Lexer } from "./parser/lexer.js";
 import { FormulaRuntime } from "./runtime.js";
 
 let source1 = new MockDataSource({
@@ -65,7 +66,7 @@ class RowEnvironment extends Environment {
 }
 
 /*
- Todo 
+ Todo  Known limitations:
  - support (10).thing().thing()
  - support "String".methods()
  - support thing()() ?
@@ -96,7 +97,7 @@ rt.define({
 
 // for each database create a new environment
 let sourceEnv = new DataViewFormulaEnvironment(source1);
-const [formula, error] = new Formula("Test Formula", src).compileSafe();
+const [formula, error] = new Formula(src, "First formula").compileSafe();
 if (error) {
 	console.error("Compilation errors:", error);
 	throw new Error("Compilation failed");

@@ -34,7 +34,6 @@ export class Instance<Env extends Environment = Environment> {
 	}
 
 	eval() {
-		console.log(this.formula.toString());
 		const interpreter = new SimpleInterpreter(this.environment);
 		return this.formula.visit(interpreter);
 	}

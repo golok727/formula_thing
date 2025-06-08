@@ -36,6 +36,7 @@ export class Environment {
 
 	define(def: EnvDefineConfig<this>): this {
 		if (def.type === "function") {
+			// todo name validation
 			// we need parent check as well
 			if (this._functions.has(def.linkname)) {
 				throw new Error(
