@@ -1,13 +1,13 @@
-# af_formula
-
+# Formula
 A lightweight, extensible formula language for embedding in applications, especially for spreadsheet-like or data-driven environments.
 
 ---
 
 ## Table of Contents
-- [af\_formula](#af_formula)
+- [Formula](#formula)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
+  - [This formula language supports expressions, function calls, custom environments, and a standard library of functions. It is designed for easy integration and extension.](#this-formula-language-supports-expressions-function-calls-custom-environments-and-a-standard-library-of-functions-it-is-designed-for-easy-integration-and-extension)
   - [Language Features](#language-features)
     - [1. Expressions](#1-expressions)
     - [2. Function Calls](#2-function-calls)
@@ -15,20 +15,16 @@ A lightweight, extensible formula language for embedding in applications, especi
   - [Built-in Functions](#built-in-functions)
     - [Standard Library](#standard-library)
     - [Custom Functions](#custom-functions)
-  - [Example Usage](#example-usage)
-    - [Data Environment](#data-environment)
+  - [Example usage with Database](#example-usage-with-database)
     - [Running a Formula](#running-a-formula)
   - [Extending the Language](#extending-the-language)
   - [Syntax Reference](#syntax-reference)
-  - [Project Structure](#project-structure)
-  - [Setup \& Running](#setup--running)
+  - [Setup \& Running Repl](#setup--running-repl)
 
 ---
 
 ## Overview
-
-**af_formula** supports expressions, function calls, custom environments, and a standard library of functions. It is designed for easy integration and extension.
-
+This formula language supports expressions, function calls, custom environments, and a standard library of functions. It is designed for easy integration and extension.
 ---
 
 ## Language Features
@@ -65,11 +61,11 @@ A lightweight, extensible formula language for embedding in applications, especi
 > Note: `prop` is not a standard lib function
 - **if(condition, trueBranch, falseBranch):**  
   Conditional branching  
-  Example: `if(prop("Age") >= 18, "Adult", "Minor")`
+  Example: `if(true, "Block", "Suite")`
 - **concat(...args):**  
   Concatenate strings  
   Example: `concat("Hello, ", prop("Name"))` 
-  or just use `+` operator `"Hello, " + prop("Name")`
+  same as using `+` operator `"Hello, " + prop("Name")`
 
 ### Custom Functions
 You can define your own functions by extending the environment.  
@@ -84,17 +80,17 @@ runtime.define({
 ```
 ---
 
-## Example Usage
-
-### Data Environment
-You can bind the formula engine to a data source and access row/column data via the `prop` function.
-
+## Example usage with Database
 ```ts
 const src = `
 if(
-  prop("Age") >= 18, 
-  concat(prop("Name"), " is ", "Adult"),
-  concat(prop("Name"), " is ", "Minor")
+	prop("Age") >= 18, 
+	prop("Name") + " is " + "Adult",
+	if(
+		prop("Age") >= 10,
+		prop("Name") +  " is " + "Teenager",
+		prop("Name")+ " is "+ "Child"
+	)
 )
 `;
 ```
@@ -104,9 +100,23 @@ if(
 ```ts
 // a runtime is just a environment which has the standard library functions
 const runtime = new FormulaRuntime(); 
+
+class RowEnv extends Environment {
+  constructor(public rowId: string, public dataSource: DataSource) {
+    runtime.define({
+      type: "function", 
+      fn: (me, args) => {
+        const colName = args.get(0); 
+        const cell =  me.dataSource.getCellValue(this.rowId, colName);
+        return new StringValue(cell);
+      }
+    })
+  }
+}
+
 const formula = new Formula(src, "Test").compile();
-const instance = runtime.createInstance(formula, new RowEnvironment("1", sourceEnv));
-const result = instance.eval();
+const row = runtime.createInstance(formula, new RowEnv(rowId, dataSource));
+const result = row.eval();
 console.log(result.asString());
 ```
 
@@ -125,28 +135,19 @@ console.log(result.asString());
 
 | Feature         | Example                                 |
 |-----------------|-----------------------------------------|
-| Number          | `123`, `3.14`                           |
+| Number          | `123`, `3.14`, `1e-10`                  |
 | String          | `"hello"`, `'world'`                    |
 | Boolean         | `true`, `false`                         |
 | Binary Op       | `a + b`, `x >= 10`, `a && b`            |
 | Unary Op        | `-x`, `!flag`                           |
 | Function Call   | `if(cond, a, b)`, `concat(a, b, c)`     |
-| Member Access   | `prop("Name").length`                  |
+| Member Access   | `prop("Name").length()`                 |
 | Parentheses     | `(a + b) * c`                           |
 
 ---
 
-## Project Structure
 
-- `src/` — Source code
-  - `language/` — Core formula engine
-  - `parser/` — Lexer and parser
-  - `__mock.ts` — Mock data and helpers
-  - `runtime.ts` — Standard library functions
-
----
-
-## Setup & Running
+## Setup & Running Repl
 
 To install dependencies:
 
@@ -159,11 +160,5 @@ To run the REPL:
 ```bash
 bun run repl 
 ```
-
-To run a script:
-```bash
-bun run index.ts
-```
-
 
 ---

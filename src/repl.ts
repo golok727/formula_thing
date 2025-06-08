@@ -5,6 +5,7 @@ import { FormulaRuntime } from "./runtime.js";
 import readline from "node:readline/promises";
 
 let running = true;
+
 const runtime = new FormulaRuntime();
 runtime.define({
 	type: "function",

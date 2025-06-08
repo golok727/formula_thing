@@ -75,11 +75,11 @@ class RowEnvironment extends Environment {
 const src = `
 if(
 	prop("Age") >= 18, 
-	concat(prop("Name"), " is ", "Adult"),
+	prop("Name") + " is " + "Adult",
 	if(
 		prop("Age") >= 10,
-		concat(prop("Name"), " is ", "Teenager"),
-		concat(prop("Name"), " is ", "Child")
+		prop("Name") +  " is " + "Teenager",
+		prop("Name")+ " is "+ "Child"
 	)
 )
 `.trim();
