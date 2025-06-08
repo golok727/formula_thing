@@ -3,6 +3,7 @@ import {
 	binaryOpFromTokenKind,
 	CallExpr,
 	EmptyExpr,
+	getOpPrecedence,
 	Ident,
 	LiteralExpr,
 	MemberExpr,
@@ -70,11 +71,8 @@ export class Parser {
 	private _parseFnCall(callee: Expr): Expr {
 		const args = this._parseParenthesized(() => {
 			let argsList = this._parseSeriesOf(() => {
-				return this.parseExprUnit();
+				return this._parseExpr();
 			}, TokenKind.Comma);
-			if (this._nextIs(TokenKind.Comma)) {
-				throw new Error(`Unexpected comma at position ${this.t0?.span.start}.`);
-			}
 			return argsList;
 		});
 
@@ -151,7 +149,7 @@ export class Parser {
 		return ident;
 	}
 
-	private parseExprUnit(): Expr | null {
+	private _parseExprUnit(): Expr | null {
 		if (this.t0) {
 			switch (this.t0.kind) {
 				case TokenKind.Number: {
@@ -171,17 +169,17 @@ export class Parser {
 						token.span
 					);
 				}
+				case TokenKind.Ident: {
+					return this._parseIdent();
+				}
 				case TokenKind.Boolean: {
 					const token = this._nextToken()!; // consume the literal
 					const value = token.source(this.source) === "true";
 					return new LiteralExpr(value, token.span);
 				}
-				case TokenKind.Ident: {
-					return this._parseIdent();
-				}
 				case TokenKind.LParen: {
 					return this._parseParenthesized(() => {
-						const expr = this.parseExprUnit();
+						const expr = this._parseExprUnit();
 						if (!expr) {
 							throw new Error(`Expected an expression inside parentheses.'`);
 						}
@@ -190,7 +188,7 @@ export class Parser {
 				}
 				case TokenKind.Not: {
 					const not = this._nextToken()!; // consume 'not'
-					const expr = this.parseExprUnit();
+					const expr = this._parseExprUnit();
 					if (!expr) {
 						throw new Error(
 							`Expected an expression after '${not.source(this.source)}'.`
@@ -200,7 +198,7 @@ export class Parser {
 				}
 				case TokenKind.Minus: {
 					const minus = this._nextToken()!; // consume '-'
-					const expr = this.parseExprUnit();
+					const expr = this._parseExprUnit();
 					if (!expr) {
 						throw new Error(
 							`Expected an expression after '${minus.source(this.source)}'.`
@@ -215,40 +213,63 @@ export class Parser {
 		return null;
 	}
 
-	private _parseImpl(): Expr {
+	private getOpPrecedence(kind: TokenKind | null) {
+		if (!kind) return null;
+		const op = binaryOpFromTokenKind(kind);
+		if (!op) return null;
+		return getOpPrecedence(op);
+	}
+
+	private _parseExpr(): Expr | null {
 		if (this._isEof()) {
-			return new EmptyExpr(span(0, 0));
+			return null;
 		}
 
-		const expr = this.parseExprUnit();
-		if (!expr) {
-			throw new Error(
-				`Unexpected token: ${this.t0?.kind ?? TokenKind.Eof} at position ${
-					this.t0?.span.start
-				}`
-			);
+		const exprStack: Expr[] = [];
+		const opStack: OpWithPrecedence[] = [];
+
+		for (;;) {
+			const exprUnit = this._parseExprUnit();
+
+			if (exprUnit !== null) {
+				exprStack.push(exprUnit);
+			} else if (exprStack.length === 0) {
+				return null;
+			} else {
+				throw new Error("Op naked right");
+			}
+
+			const mayBeOp = this.t0;
+			const precedence = this.getOpPrecedence(mayBeOp?.kind ?? null);
+
+			if (precedence !== null) {
+				this._nextToken(); // consume the operator token
+				handleOp(
+					{
+						token:
+							mayBeOp! /* getOpPrecedence will return null if token is null */,
+						precedence,
+					},
+					opStack,
+					exprStack,
+					opExprReducer
+				);
+			} else {
+				break;
+			}
 		}
 
+		const expr = handleOp(null, opStack, exprStack, opExprReducer);
 		return expr;
 	}
 
-	parse(): [result: Expr, errors: null] | [result: null, errors: Error[]] {
-		let res: Expr | undefined;
-
+	parse(): [result: Expr, error: null] | [result: null, error: unknown] {
 		try {
-			res = this._parseImpl();
-			console.log(res.toString());
+			const res = this._parseExpr();
+			return [res ?? new EmptyExpr(span(0, 0)), null];
 		} catch (error) {
 			console.error(error);
-			this.errors.push(error);
-		}
-
-		if (this.errors.length > 0) {
-			return [null, this.errors as Error[]];
-		}
-
-		if (!res) {
-			res = new EmptyExpr(span(0, 0));
+			return [null, error];
 		}
 	}
 }

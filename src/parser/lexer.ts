@@ -272,6 +272,22 @@ export class Lexer implements Iterable<Token> {
 				return TokenKind.Comma;
 			case ".":
 				return TokenKind.Dot;
+			case "&": {
+				const next = this.chars.peek();
+				if (next === "&") {
+					this.chars.next(); // consume the next '&'
+					return TokenKind.And;
+				}
+				return TokenKind.Unknown; // single '&' is not supported
+			}
+			case "|": {
+				const next = this.chars.peek();
+				if (next === "|") {
+					this.chars.next(); // consume the next '|'
+					return TokenKind.Or;
+				}
+				return TokenKind.Unknown; // single '|' is not supported
+			}
 			case "<": {
 				const next = this.chars.peek();
 				if (next === "=") {

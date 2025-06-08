@@ -78,16 +78,6 @@ const src = `
 // const tokens = [...lexer].map((t) => t.toString());
 // console.log(tokens.join("\n"));
 
-let parser = new Parser(
-	`		
-	if(
-			!prop("Age") >= 18, 
-			concat(prop("Name"), " is ", "Adult"), 
-			concat(prop("Name"), " is ", "Minor")
-	) 
-	`.trim()
-);
-parser.parse();
 // gives functions like `if`..
 let rt = new FormulaRuntime();
 rt.define({
@@ -100,9 +90,10 @@ rt.define({
 });
 // for each database create a new environment
 let sourceEnv = new DataViewFormulaEnvironment(source1);
-const [formula, errors] = new Formula("Test Formula", src).compileSafe();
-if (errors) {
-	throw new Error(`Compilation errors: ${errors.join(", ")}`);
+const [formula, error] = new Formula("Test Formula", src).compileSafe();
+if (error) {
+	console.error("Compilation errors:", error);
+	throw new Error("Compilation failed");
 }
 // each cell can have its own instance of the formula
 const row1 = rt.createInstance(formula, new RowEnvironment("1", sourceEnv));

@@ -1,10 +1,14 @@
 import { SAMPLE_FORMULA } from "../__mock.js";
 import type { Expr } from "../ast.js";
+import { Parser } from "../parser/parse.js";
 import type { Visit, Visitor } from "../visitor.ts";
 
-export type CompilationResult =
-	| [formula: Formula, errors: null]
-	| [null, errors: unknown[]];
+export class CompilationError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "CompilationError";
+	}
+}
 
 export class Formula implements Visit {
 	private _root: Expr | null = null;
@@ -25,14 +29,23 @@ export class Formula implements Visit {
 	compile(): this {
 		const errors = this.compileSafe()[1];
 		if (errors) {
-			throw new Error(`Compilation failed: ${errors.join(", ")}`);
+			console.error("Failed to compile formula:", this.name, "Errors:", errors);
+			throw new Error(`Compilation failed for formula "${this.name}"`);
 		}
 		return this;
 	}
 
-	compileSafe(): CompilationResult {
-		// todo parse the source code here
-		this._root = SAMPLE_FORMULA;
+	compileSafe():
+		| [formula: Formula, error: null]
+		| [formula: null, error: CompilationError] {
+		const parser = new Parser(this.source);
+		let [root, error] = parser.parse();
+
+		if (error) {
+			// todo - handle errors properly
+			return [null, new CompilationError(`Parsing error: ${error}`)];
+		}
+		this._root = root;
 		return [this, null];
 	}
 
