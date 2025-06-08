@@ -6,6 +6,7 @@ import {
 } from "./language/index.js";
 import { BooleanValue, NumberValue, StringValue } from "./language/value.js";
 import { Lexer } from "./parser/lexer.js";
+import { Parser } from "./parser/parse.js";
 import { FormulaRuntime } from "./runtime.js";
 
 let source1 = new MockDataSource({
@@ -73,9 +74,20 @@ const src = `
  ) 
 `.trim();
 
-const lexer = new Lexer(src);
-const tokens = [...lexer].map((t) => t.toString());
-console.log(tokens.join("\n"));
+// const lexer = new Lexer(src);
+// const tokens = [...lexer].map((t) => t.toString());
+// console.log(tokens.join("\n"));
+
+let parser = new Parser(
+	`	
+	if(
+			true, 
+			concat(prop("Name"), " is ", "Adult"), 
+			concat(prop("Name"), " is ", "Minor")
+	) 
+	`.trim()
+);
+parser.parse();
 // gives functions like `if`..
 let rt = new FormulaRuntime();
 rt.define({

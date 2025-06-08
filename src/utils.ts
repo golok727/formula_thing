@@ -10,6 +10,9 @@ import {
 } from "./ast.js";
 
 export class Printer implements Visitor<string> {
+	visitEmptyExpr(): string {
+		return "";
+	}
 	visitLiteralExpr(expr: LiteralExpr): string {
 		return JSON.stringify(expr.value);
 	}

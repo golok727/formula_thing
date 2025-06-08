@@ -42,6 +42,11 @@ export class Instance<Env extends Environment = Environment> {
 
 class ValueEvaluator implements Visitor<Value> {
 	constructor(public env: Environment) {}
+
+	visitEmptyExpr(): Value {
+		return None;
+	}
+
 	visitLiteralExpr(expr: LiteralExpr): Value {
 		switch (typeof expr.value) {
 			case "string":

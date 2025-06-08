@@ -1,6 +1,7 @@
 import type {
 	BinaryExpr,
 	CallExpr,
+	EmptyExpr,
 	Ident,
 	LiteralExpr,
 	MemberExpr,
@@ -8,6 +9,7 @@ import type {
 } from "./ast.js";
 
 export interface Visitor<Result = unknown> {
+	visitEmptyExpr(expr: EmptyExpr): Result;
 	visitLiteralExpr(expr: LiteralExpr): Result;
 	visitIdent(expr: Ident): Result;
 	visitBinaryExpr(expr: BinaryExpr): Result;

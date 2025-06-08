@@ -261,13 +261,13 @@ export class Lexer implements Iterable<Token> {
 			case "\\":
 				return TokenKind.BackSlash;
 			case "(":
-				return TokenKind.OpenParen;
+				return TokenKind.LParen;
 			case ")":
-				return TokenKind.CloseParen;
+				return TokenKind.RParen;
 			case "[":
-				return TokenKind.OpenBracket;
+				return TokenKind.LBracket;
 			case "]":
-				return TokenKind.CloseBracket;
+				return TokenKind.RBracket;
 			case ",":
 				return TokenKind.Comma;
 			case ".":

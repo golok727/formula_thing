@@ -12,6 +12,16 @@ export abstract class Expr implements Visit {
 	}
 }
 
+export class EmptyExpr extends Expr {
+	constructor(span: SrcSpan) {
+		super(span);
+	}
+
+	visit<Result>(visitor: Visitor<Result>): Result {
+		return visitor.visitEmptyExpr(this);
+	}
+}
+
 export class LiteralExpr extends Expr {
 	constructor(public readonly value: string | number | boolean, span: SrcSpan) {
 		super(span);
