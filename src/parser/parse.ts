@@ -14,19 +14,10 @@ import { span } from "../span.js";
 import { Lexer } from "./lexer.js";
 import { Token, TokenKind } from "./token.js";
 
-const src = `
- if(
-		prop("Age") >= 18, 
-		concat(prop("Name"), " is ", "Adult"), 
-		concat(prop("Name"), " is ", "Minor")
- ) 
-`.trim();
-
 export class Parser {
 	private tokens: Lexer;
 	private t0: Token | null = null;
 	private t1: Token | null = null;
-	private errors: unknown[] = [];
 
 	constructor(public readonly source: string) {
 		this.tokens = new Lexer(source);

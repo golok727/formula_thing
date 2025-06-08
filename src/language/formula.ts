@@ -1,4 +1,3 @@
-import { SAMPLE_FORMULA } from "../__mock.js";
 import type { Expr } from "../ast.js";
 import { Parser } from "../parser/parse.js";
 import type { Visit, Visitor } from "../visitor.ts";
