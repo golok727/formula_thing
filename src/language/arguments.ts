@@ -1,4 +1,4 @@
-import { None, type Value } from "./value.js";
+import { None, type Value } from "./core/value.js";
 
 export class Arguments {
 	constructor(public readonly args: Value[]) {}
@@ -9,7 +9,7 @@ export class Arguments {
 
 	get(index: number): Value {
 		if (index < 0 || index >= this.args.length) {
-			throw new Error(`Argument index ${index} out of bounds`);
+			return None;
 		}
 		return this.args[index] || None;
 	}

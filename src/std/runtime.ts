@@ -1,6 +1,6 @@
-import { Environment } from "./language/environment.js";
-import type { EnvDefineConfig } from "./language/types.js";
-import { StringValue } from "./language/value.js";
+import { Environment } from "../language/environment.js";
+import type { EnvDefineConfig } from "../language/types.js";
+import { StringValue } from "../language/core/value.js";
 
 /**
  * This environment provides the standard library functions
@@ -32,6 +32,12 @@ export class FormulaRuntime extends Environment {
 		const condition = args.get(0).asBoolean();
 		const trueBranch = args.get(1);
 		const falseBranch = args.get(2);
+		// todo error handling
+		if (trueBranch.isNone() || falseBranch.isNone()) {
+			throw new Error(
+				"Insufficient arguments for if function. Expected 3 arguments: condition, trueBranch, falseBranch."
+			);
+		}
 		if (condition) {
 			return trueBranch;
 		} else {

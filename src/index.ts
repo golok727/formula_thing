@@ -4,9 +4,13 @@ import {
 	Formula,
 	type EnvDefineConfig,
 } from "./language/index.js";
-import { BooleanValue, NumberValue, StringValue } from "./language/value.js";
+import {
+	BooleanValue,
+	NumberValue,
+	StringValue,
+} from "./language/core/value.js";
 import { Lexer } from "./parser/lexer.js";
-import { FormulaRuntime } from "./runtime.js";
+import { FormulaRuntime } from "./std/runtime.js";
 
 let source1 = new MockDataSource({
 	Age: {
@@ -50,6 +54,9 @@ class RowEnvironment extends Environment {
 	private static _prop: EnvDefineConfig<RowEnvironment>["fn"] = (env, args) => {
 		let rowId = env.rowId;
 		let colName = args.get(0);
+		if (colName.isNone()) {
+			throw new Error("Column name must be provided to prop function.");
+		}
 		let cell = (env.parent as DataViewFormulaEnvironment).dataSource.getCell(
 			rowId,
 			colName.asString()

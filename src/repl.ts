@@ -1,6 +1,6 @@
 import { Formula } from "./language/formula.js";
 import { Environment, StringValue, type Value } from "./language/index.js";
-import { FormulaRuntime } from "./runtime.js";
+import { FormulaRuntime } from "./std/runtime.js";
 
 import readline from "node:readline/promises";
 

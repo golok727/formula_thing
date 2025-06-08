@@ -1,6 +1,6 @@
 import type { Arguments } from "./arguments.js";
 import type { Environment } from "./environment.js";
-import type { Value } from "./value.ts";
+import type { Value } from "./core/value.js";
 
 export type EnvDefineConfig<Env extends Environment = Environment> =
 	FunctionDefinition<Env>;

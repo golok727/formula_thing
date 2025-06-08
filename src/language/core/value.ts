@@ -1,0 +1,159 @@
+import { Arguments } from "../arguments.js";
+import { OpAddTraitId } from "./op.js";
+import { type Trait, type TraitDefinition } from "./trait.js";
+
+export interface Value {
+	// should be unique
+	readonly typeHint: string;
+	asString(): string;
+	asBoolean(): boolean;
+	asNumber(): number;
+	isNone(): boolean;
+}
+
+export abstract class BaseValue implements Value {
+	static traits: Map<string, Trait> = new Map();
+
+	abstract typeHint: string;
+	abstract asString(): string;
+	abstract asBoolean(): boolean;
+	abstract asNumber(): number;
+	abstract isNone(): boolean;
+
+	// add  this and other values together
+	// only use this if this has a trait implementation or it will throw an error
+	add(other: Value) {
+		const trait = this.getImpl(OpAddTraitId);
+		return trait.add(this, new Arguments([other]));
+	}
+
+	getImpl<T extends Trait = Trait>(trait: TraitDefinition<T>): T {
+		const impl = (this.constructor as typeof BaseValue).traits.get(trait.id);
+		if (!impl) {
+			throw new Error(
+				`Trait ${trait.id} is not implemented for ${this.typeHint}.`
+			);
+		}
+		return impl as T;
+	}
+
+	useImpl<R, T extends Trait = Trait>(
+		trait: TraitDefinition<T>,
+		access: (value: this, trait: T) => R
+	) {
+		const impl = (this.constructor as typeof BaseValue).traits.get(trait.id);
+		if (!impl) {
+			throw new Error(
+				`Trait ${trait.id} is not implemented for ${this.typeHint}.`
+			);
+		}
+		return access(this, impl as T);
+	}
+
+	static addImpl<V extends Value = Value, T = Trait<V>>(
+		trait: TraitDefinition,
+		impl: T,
+		replace?: boolean
+	) {
+		if (this.traits.has(trait.id) && !replace) {
+			throw new Error(`Trait ${trait.id} is already defined.`);
+		}
+		this.traits.set(trait.id, impl as never);
+	}
+}
+
+export class NoneValue extends BaseValue {
+	readonly typeHint: string = "None";
+	constructor() {
+		super();
+	}
+	asString(): string {
+		return "None";
+	}
+	asBoolean(): boolean {
+		return false;
+	}
+	asNumber(): number {
+		return 0;
+	}
+	isNone(): boolean {
+		return true;
+	}
+}
+
+export const None = new NoneValue();
+
+export class BooleanValue extends BaseValue {
+	readonly typeHint: string = "boolean";
+
+	constructor(public value: boolean) {
+		super();
+	}
+
+	asString(): string {
+		return this.value ? "true" : "false";
+	}
+
+	asBoolean(): boolean {
+		return this.value;
+	}
+
+	asNumber(): number {
+		return this.value ? 1 : 0;
+	}
+
+	isNone(): boolean {
+		return false;
+	}
+}
+BooleanValue.addImpl<BooleanValue>(OpAddTraitId, {
+	add: (me, args): Value => {
+		throw new Error(
+			"Boolean values do not support addition. Use logical operations instead."
+		);
+	},
+});
+
+export class NumberValue implements Value {
+	readonly typeHint: string = "number";
+
+	constructor(public value: number) {}
+
+	asString(): string {
+		return this.value.toString();
+	}
+
+	asBoolean(): boolean {
+		return this.value !== 0;
+	}
+
+	asNumber(): number {
+		return this.value;
+	}
+
+	isNone(): boolean {
+		return false;
+	}
+}
+export class StringValue implements Value {
+	readonly typeHint: string = "string";
+
+	constructor(public value: string) {}
+
+	asString(): string {
+		return this.value;
+	}
+
+	asBoolean(): boolean {
+		return this.value.length > 0;
+	}
+
+	asNumber(): number {
+		const num = parseFloat(this.value);
+		return isNaN(num) ? 0 : num;
+	}
+
+	isNone(): boolean {
+		return false;
+	}
+}
