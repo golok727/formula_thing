@@ -230,7 +230,7 @@ export class Lexer implements Iterable<Token> {
 	}
 	/* Parse number end */
 
-	private _eatQuotedString(quoteChar: string, start: number): TokenKind {
+	private _consumeQuotedString(quoteChar: string, start: number): TokenKind {
 		for (;;) {
 			let next = this.chars.peek();
 			if (next === undefined) {
@@ -320,7 +320,7 @@ export class Lexer implements Iterable<Token> {
 			}
 			case "'":
 			case '"': {
-				return this._eatQuotedString(c, start);
+				return this._consumeQuotedString(c, start);
 			}
 			default: {
 				return TokenKind.Unknown;

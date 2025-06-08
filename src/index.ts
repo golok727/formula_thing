@@ -79,9 +79,9 @@ const src = `
 // console.log(tokens.join("\n"));
 
 let parser = new Parser(
-	`	
+	`		
 	if(
-			true, 
+			!prop("Age"), 
 			concat(prop("Name"), " is ", "Adult"), 
 			concat(prop("Name"), " is ", "Minor")
 	) 

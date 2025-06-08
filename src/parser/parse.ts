@@ -1,9 +1,12 @@
 import {
+	BinaryExpr,
+	binaryOpFromTokenKind,
 	CallExpr,
 	EmptyExpr,
 	Ident,
 	LiteralExpr,
 	MemberExpr,
+	UnaryExpr,
 	type Expr,
 } from "../ast.js";
 import { span } from "../span.js";
@@ -67,7 +70,7 @@ export class Parser {
 	private _parseFnCall(callee: Expr): Expr {
 		const args = this._parseParenthesized(() => {
 			return this._parseSeriesOf(() => {
-				return this._parsePrimary();
+				return this.parseExprUnit();
 			}, TokenKind.Comma);
 		});
 		const fn = new CallExpr(callee, args, span(0, 0));
@@ -140,7 +143,7 @@ export class Parser {
 		return ident;
 	}
 
-	private _parsePrimary(): Expr | null {
+	private parseExprUnit(): Expr | null {
 		if (this.t0) {
 			switch (this.t0.kind) {
 				case TokenKind.Number: {
@@ -168,6 +171,35 @@ export class Parser {
 				case TokenKind.Ident: {
 					return this._parseIdent();
 				}
+				case TokenKind.LParen: {
+					return this._parseParenthesized(() => {
+						const expr = this.parseExprUnit();
+						if (!expr) {
+							throw new Error(`Expected an expression inside parentheses.'`);
+						}
+						return expr;
+					});
+				}
+				case TokenKind.Not: {
+					const not = this._nextToken()!; // consume 'not'
+					const expr = this.parseExprUnit();
+					if (!expr) {
+						throw new Error(
+							`Expected an expression after '${not.source(this.source)}'.`
+						);
+					}
+					return new UnaryExpr("!", expr, not.span);
+				}
+				case TokenKind.Minus: {
+					const minus = this._nextToken()!; // consume '-'
+					const expr = this.parseExprUnit();
+					if (!expr) {
+						throw new Error(
+							`Expected an expression after '${minus.source(this.source)}'.`
+						);
+					}
+					return new UnaryExpr("-", expr, minus.span);
+				}
 				default:
 					return null;
 			}
@@ -179,8 +211,8 @@ export class Parser {
 		if (this._isEof()) {
 			return new EmptyExpr(span(0, 0));
 		}
-		// todo loop
-		const expr = this._parsePrimary();
+
+		const expr = this.parseExprUnit();
 		if (!expr) {
 			throw new Error(
 				`Unexpected token: ${this.t0?.kind ?? TokenKind.Eof} at position ${
@@ -194,6 +226,7 @@ export class Parser {
 
 	parse(): [result: Expr, errors: null] | [result: null, errors: Error[]] {
 		let res: Expr | undefined;
+
 		try {
 			res = this._parseImpl();
 			console.log(res.toString());
@@ -210,4 +243,67 @@ export class Parser {
 			res = new EmptyExpr(span(0, 0));
 		}
 	}
+}
+
+type OpWithPrecedence = { token: Token; precedence: number };
+
+function handleOp(
+	nextOp: OpWithPrecedence | null,
+	opStack: OpWithPrecedence[],
+	exprStack: Expr[],
+	reducer: (op: Token, exprStack: Expr[]) => void
+): Expr | null {
+	let nxtOp = nextOp;
+
+	for (;;) {
+		const op = opStack.pop();
+		if (!op && !nxtOp) {
+			// if we don't have any operators left return the final expr
+			const expr = exprStack.pop();
+
+			if (!expr) return null;
+
+			if (exprStack.length === 0) return expr;
+
+			throw new Error(
+				"@@internal Expression not fully reduced for some reason"
+			);
+		}
+
+		if (!op && nxtOp) {
+			opStack.push(nxtOp);
+			break;
+		}
+
+		if (op && !nxtOp) {
+			reducer(op.token, exprStack);
+		} else if (op && nxtOp) {
+			const { token: opl, precedence: pl } = op;
+			const { token: opr, precedence: pr } = nxtOp;
+			if (pl >= pr) {
+				reducer(opl, exprStack);
+				nxtOp = { token: opr, precedence: pr };
+			} else {
+				opStack.push({ token: opl, precedence: pl });
+				opStack.push({ token: opr, precedence: pr });
+				break;
+			}
+		} else break;
+	}
+	return null;
+}
+
+function opExprReducer(opTok: Token, exprStack: Expr[]) {
+	const right = exprStack.pop();
+	const left = exprStack.pop();
+	if (!left || !right)
+		throw new Error(
+			"@@internal Cant reduce expression. required minimum of 2 expr"
+		);
+
+	const op = binaryOpFromTokenKind(opTok.kind);
+	if (op === null) throw new Error(`invalid binary op token ${opTok.kind}`);
+
+	const expr = new BinaryExpr(left, op, right, span(0, 0));
+	exprStack.push(expr);
 }
