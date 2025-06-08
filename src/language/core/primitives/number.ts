@@ -3,6 +3,8 @@ import {
 	DivTrait,
 	EqTrait,
 	MulTrait,
+	NegTrait,
+	NotTrait,
 	Ordering,
 	OrdTrait,
 	RemTrait,
@@ -10,7 +12,7 @@ import {
 	type Eq,
 } from "../op.js";
 import { BaseValue, type Value } from "../value.js";
-import { StringValue } from "./string.js";
+import { BooleanValue } from "./index.js";
 
 export class NumberValue extends BaseValue {
 	readonly typeHint: string = "Number";
@@ -61,20 +63,18 @@ export class NumberValue extends BaseValue {
 		return a === b ? Ordering.Eq : a < b ? Ordering.Lt : Ordering.Gt;
 	}
 
-	static eq(me: NumberValue, other: Value): boolean {
-		if (!NumberValue.is(other)) {
+	static eq(me: NumberValue, other: Value): BooleanValue {
+		if (!(me instanceof NumberValue)) {
 			throw new Error(
 				`First parameter to NumberValue.eq must be a NumberValue but got ${other.typeHint}`
 			);
 		}
-		return other instanceof NumberValue && me.value === other.value;
+		return new BooleanValue(
+			other instanceof NumberValue && me.value === other.value
+		);
+	}
+
+	static neg(me: Value): NumberValue {
+		return new NumberValue(-me.asNumber());
 	}
 }
-
-NumberValue.addImpl(AddTrait, NumberValue);
-NumberValue.addImpl(SubTrait, NumberValue);
-NumberValue.addImpl(MulTrait, NumberValue);
-NumberValue.addImpl(DivTrait, NumberValue);
-NumberValue.addImpl(RemTrait, NumberValue);
-NumberValue.addImpl(OrdTrait, NumberValue);
-NumberValue.addImpl<Eq<NumberValue>>(EqTrait, NumberValue);

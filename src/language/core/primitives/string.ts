@@ -3,6 +3,8 @@ import {
 	DivTrait,
 	EqTrait,
 	MulTrait,
+	NegTrait,
+	NotTrait,
 	Ordering,
 	OrdTrait,
 	RemTrait,
@@ -10,7 +12,8 @@ import {
 	type Eq,
 } from "../op.js";
 import { BaseValue, type Value } from "../value.js";
-import { NumberValue } from "./number.js";
+import { BooleanValue } from "./index.js";
+import { NumberValue } from "./index.js";
 
 export class StringValue extends BaseValue {
 	readonly typeHint: string = "String";
@@ -48,20 +51,14 @@ export class StringValue extends BaseValue {
 		return NumberValue.cmp(me, other);
 	}
 
-	static eq(me: StringValue, other: Value): boolean {
-		if (!StringValue.is(other)) {
+	static eq(me: StringValue, other: Value): BooleanValue {
+		if (!(me instanceof StringValue)) {
 			throw new Error(
 				`First parameter to StringValue.eq must be a StringValue but got ${other.typeHint}`
 			);
 		}
-		return other instanceof StringValue && me.value === other.value;
+		return new BooleanValue(
+			other instanceof StringValue && me.value === other.value
+		);
 	}
 }
-
-StringValue.addImpl(AddTrait, StringValue);
-StringValue.addImpl(SubTrait, NumberValue);
-StringValue.addImpl(MulTrait, NumberValue);
-StringValue.addImpl(DivTrait, NumberValue);
-StringValue.addImpl(RemTrait, NumberValue);
-StringValue.addImpl(OrdTrait, StringValue);
-StringValue.addImpl<Eq<StringValue>>(EqTrait, StringValue);

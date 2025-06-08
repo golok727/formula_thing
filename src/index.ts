@@ -6,6 +6,7 @@ import {
 	Environment,
 	Formula,
 	type EnvDefineConfig,
+	type FunctionDefinition,
 } from "./language/index.js";
 import { FormulaRuntime } from "./std/runtime.js";
 
@@ -48,7 +49,10 @@ class RowEnvironment extends Environment {
 		});
 	}
 
-	private static _prop: EnvDefineConfig<RowEnvironment>["fn"] = (env, args) => {
+	private static _prop: FunctionDefinition<RowEnvironment>["fn"] = (
+		env,
+		args
+	) => {
 		let rowId = env.rowId;
 		let colName = args.get(0);
 		if (colName.isNone()) {

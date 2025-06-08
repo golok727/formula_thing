@@ -1,6 +1,6 @@
 import { Environment } from "../language/environment.js";
-import type { EnvDefineConfig } from "../language/types.js";
-import { StringValue } from "../language/core/index.js";
+import type { EnvDefineConfig, FunctionDefinition } from "../language/types.js";
+import { None, StringValue } from "../language/core/index.js";
 
 /**
  * This environment provides the standard library functions
@@ -22,13 +22,22 @@ export class FormulaRuntime extends Environment {
 				"Concatenates multiple string values into a single string. \n\nUsage: `concat(value1, value2, ...)`",
 			fn: FormulaRuntime._concat,
 		});
+		this.define({
+			type: "variable",
+			name: "None",
+			description: "Represents a None value, similar to null or undefined.",
+			getValue: () => None,
+		});
 	}
 
-	private static _concat: EnvDefineConfig<FormulaRuntime>["fn"] = (_, args) => {
+	private static _concat: FunctionDefinition<FormulaRuntime>["fn"] = (
+		_,
+		args
+	) => {
 		return new StringValue(args.args.map((arg) => arg.asString()).join(""));
 	};
 
-	private static _if: EnvDefineConfig<FormulaRuntime>["fn"] = (_, args) => {
+	private static _if: FunctionDefinition<FormulaRuntime>["fn"] = (_, args) => {
 		const condition = args.get(0).asBoolean();
 		const trueBranch = args.get(1);
 		const falseBranch = args.get(2);

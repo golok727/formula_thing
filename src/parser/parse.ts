@@ -189,7 +189,7 @@ export class Parser {
 				}
 				case TokenKind.Not: {
 					const not = this._nextToken()!; // consume 'not'
-					const expr = this._parseExpr();
+					const expr = this._parseExprUnit();
 					if (!expr) {
 						throw new Error(
 							`Expected an expression after '${not.source(this.source)}'.`
@@ -199,7 +199,7 @@ export class Parser {
 				}
 				case TokenKind.Minus: {
 					const minus = this._nextToken()!; // consume '-'
-					const expr = this._parseExpr();
+					const expr = this._parseExprUnit();
 					if (!expr) {
 						throw new Error(
 							`Expected an expression after '${minus.source(this.source)}'.`

@@ -118,7 +118,13 @@ export const BinaryOp = {
 
 export type BinaryOp = (typeof BinaryOp)[keyof typeof BinaryOp];
 
-export type UnaryOp = "!" | "-" | "+";
+export const UnaryOp = {
+	Not: "!",
+	Negate: "-",
+} as const;
+
+export type UnaryOp = (typeof UnaryOp)[keyof typeof UnaryOp];
+
 export function binaryOpFromTokenKind(kind: TokenKind): BinaryOp | null {
 	switch (kind) {
 		case TokenKind.Plus:

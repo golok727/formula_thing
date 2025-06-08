@@ -1,3 +1,4 @@
+import type { BooleanValue } from "./primitives/bool.js";
 import { defineTrait } from "./trait.js";
 import type { Value } from "./value.js";
 
@@ -28,7 +29,13 @@ export type Ord<T extends Value = Value> = {
 	cmp(me: T, other: Value): Ordering;
 };
 export type Eq<T extends Value = Value> = {
-	eq(me: T, other: Value): boolean;
+	eq(me: T, other: Value): BooleanValue;
+};
+export type Neg<T extends Value = Value> = {
+	neg(me: T): T;
+};
+export type Not<T extends Value = Value> = {
+	not(me: T): BooleanValue;
 };
 
 export const AddTrait = defineTrait<Add>("_core_AddTrait");
@@ -38,3 +45,5 @@ export const DivTrait = defineTrait<Div>("_core_DivTrait");
 export const RemTrait = defineTrait<Rem>("_core_RemTrait");
 export const OrdTrait = defineTrait<Ord>("_core_OrdTrait");
 export const EqTrait = defineTrait<Eq>("_core_EqTrait");
+export const NegTrait = defineTrait<Neg>("_core_NegTrait");
+export const NotTrait = defineTrait<Not>("_core_NotTrait");

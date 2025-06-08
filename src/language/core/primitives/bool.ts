@@ -3,6 +3,8 @@ import {
 	DivTrait,
 	EqTrait,
 	MulTrait,
+	NegTrait,
+	NotTrait,
 	OrdTrait,
 	RemTrait,
 	SubTrait,
@@ -34,20 +36,23 @@ export class BooleanValue extends BaseValue {
 		return false;
 	}
 
-	static eq(me: BooleanValue, other: Value): boolean {
-		if (!BooleanValue.is(other)) {
+	not(): BooleanValue {
+		return new BooleanValue(!this.value);
+	}
+
+	static eq(me: BooleanValue, other: Value): BooleanValue {
+		if (!(me instanceof BooleanValue)) {
 			throw new Error(
 				`First parameter to BooleanValue.eq must be a BooleanValue but got ${other.typeHint}`
 			);
 		}
-		return other instanceof BooleanValue && me.value === other.value;
+
+		return new BooleanValue(
+			other instanceof BooleanValue && me.value === other.value
+		);
+	}
+
+	static not(me: Value): BooleanValue {
+		return new BooleanValue(!me.asBoolean());
 	}
 }
-
-BooleanValue.addImpl(AddTrait, NumberValue);
-BooleanValue.addImpl(SubTrait, NumberValue);
-BooleanValue.addImpl(MulTrait, NumberValue);
-BooleanValue.addImpl(DivTrait, NumberValue);
-BooleanValue.addImpl(RemTrait, NumberValue);
-BooleanValue.addImpl(OrdTrait, NumberValue);
-BooleanValue.addImpl<Eq<BooleanValue>>(EqTrait, BooleanValue);

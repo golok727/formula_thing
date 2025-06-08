@@ -1,4 +1,5 @@
-import { BaseValue } from "../value.js";
+import { BaseValue, type Value } from "../value.js";
+import { BooleanValue } from "./index.js";
 
 export class NoneValue extends BaseValue {
 	readonly typeHint: string = "None";
@@ -16,6 +17,16 @@ export class NoneValue extends BaseValue {
 	}
 	isNone(): boolean {
 		return true;
+	}
+
+	static eq(me: NoneValue, other: Value): BooleanValue {
+		if (!(me instanceof NoneValue)) {
+			throw new Error(
+				`First parameter to BooleanValue.eq must be a BooleanValue but got ${other.typeHint}`
+			);
+		}
+
+		return new BooleanValue(other instanceof NoneValue);
 	}
 }
 

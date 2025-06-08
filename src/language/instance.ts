@@ -23,6 +23,8 @@ import {
 	RemTrait,
 	OrdTrait,
 	EqTrait,
+	NegTrait,
+	NotTrait,
 } from "./core/index.js";
 
 export class Instance<Env extends Environment = Environment> {
@@ -66,10 +68,12 @@ class SimpleInterpreter implements Visitor<Value> {
 		}
 	}
 
-	visitIdent(_: Ident): Value {
-		throw new Error(
-			"Method not implemented. Identifiers should be resolved in the environment."
-		);
+	visitIdent(ident: Ident): Value {
+		const val = this.env.getVariable(ident.name);
+		if (!val) {
+			throw new Error(`Identifier '${ident.name}' is not defined.`);
+		}
+		return val;
 	}
 
 	visitBinaryExpr(expr: BinaryExpr): Value {
@@ -107,19 +111,12 @@ class SimpleInterpreter implements Visitor<Value> {
 				return new BooleanValue(ord >= 0);
 			}
 			case "==": {
-				// hack
-				try {
-					return new BooleanValue(left.getImpl(EqTrait).eq(left, right));
-				} catch (e) {
-					return new BooleanValue(false);
-				}
+				// todo handle errors for non impl
+				return left.getImpl(EqTrait).eq(left, right);
 			}
 			case "!=": {
-				try {
-					return new BooleanValue(!left.getImpl(EqTrait).eq(left, right));
-				} catch (e) {
-					return new BooleanValue(true);
-				}
+				// todo handle errors for non impl
+				return left.getImpl(EqTrait).eq(left, right).not();
 			}
 			case "&&":
 				return new BooleanValue(left.asBoolean() && right.asBoolean());
@@ -131,7 +128,15 @@ class SimpleInterpreter implements Visitor<Value> {
 	}
 
 	visitUnaryExpr(expr: UnaryExpr): Value {
-		throw new Error("Method not implemented.");
+		const operand = expr.operand.visit(this);
+		switch (expr.operator) {
+			case "-":
+				return operand.getImpl(NegTrait).neg(operand);
+			case "!":
+				return operand.getImpl(NotTrait).not(operand);
+			default:
+				throw new Error(`Invalid Unary Operator ${expr.operator}`);
+		}
 	}
 	visitCallExpr(expr: CallExpr): Value {
 		if (!(expr.callee instanceof Ident)) {
