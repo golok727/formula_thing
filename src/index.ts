@@ -81,7 +81,7 @@ const src = `
 let parser = new Parser(
 	`		
 	if(
-			!prop("Age"), 
+			!prop("Age") >= 18, 
 			concat(prop("Name"), " is ", "Adult"), 
 			concat(prop("Name"), " is ", "Minor")
 	) 

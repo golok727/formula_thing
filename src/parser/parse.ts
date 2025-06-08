@@ -69,14 +69,21 @@ export class Parser {
 
 	private _parseFnCall(callee: Expr): Expr {
 		const args = this._parseParenthesized(() => {
-			return this._parseSeriesOf(() => {
+			let argsList = this._parseSeriesOf(() => {
 				return this.parseExprUnit();
 			}, TokenKind.Comma);
+			if (this._nextIs(TokenKind.Comma)) {
+				throw new Error(`Unexpected comma at position ${this.t0?.span.start}.`);
+			}
+			return argsList;
 		});
+
 		const fn = new CallExpr(callee, args, span(0, 0));
+
 		if (this._nextIs(TokenKind.Dot)) {
 			return this._parseMemberExpr(fn);
 		}
+
 		return fn;
 	}
 
@@ -96,6 +103,7 @@ export class Parser {
 			if (!delim) {
 				continue;
 			}
+
 			if (this._nextIs(delim)) {
 				this._nextToken(); // consume the delimiter
 			} else {
