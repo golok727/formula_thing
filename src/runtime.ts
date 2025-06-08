@@ -2,6 +2,9 @@ import { Environment } from "./language/environment.js";
 import type { EnvDefineConfig } from "./language/types.js";
 import { StringValue } from "./language/value.js";
 
+/**
+ * This environment provides the standard library functions
+ */
 export class FormulaRuntime extends Environment {
 	constructor() {
 		super(null);
@@ -22,7 +25,6 @@ export class FormulaRuntime extends Environment {
 	}
 
 	private static _concat: EnvDefineConfig<FormulaRuntime>["fn"] = (_, args) => {
-		// todo allow custom separator
 		return new StringValue(args.args.map((arg) => arg.asString()).join(""));
 	};
 

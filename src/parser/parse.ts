@@ -149,6 +149,7 @@ export class Parser {
 		return ident;
 	}
 
+	// Parse a single unit of expression
 	private _parseExprUnit(): Expr | null {
 		if (this.t0) {
 			switch (this.t0.kind) {
@@ -179,7 +180,7 @@ export class Parser {
 				}
 				case TokenKind.LParen: {
 					return this._parseParenthesized(() => {
-						const expr = this._parseExprUnit();
+						const expr = this._parseExpr();
 						if (!expr) {
 							throw new Error(`Expected an expression inside parentheses.'`);
 						}
@@ -188,7 +189,7 @@ export class Parser {
 				}
 				case TokenKind.Not: {
 					const not = this._nextToken()!; // consume 'not'
-					const expr = this._parseExprUnit();
+					const expr = this._parseExpr();
 					if (!expr) {
 						throw new Error(
 							`Expected an expression after '${not.source(this.source)}'.`
@@ -198,7 +199,7 @@ export class Parser {
 				}
 				case TokenKind.Minus: {
 					const minus = this._nextToken()!; // consume '-'
-					const expr = this._parseExprUnit();
+					const expr = this._parseExpr();
 					if (!expr) {
 						throw new Error(
 							`Expected an expression after '${minus.source(this.source)}'.`

@@ -35,12 +35,12 @@ export class Instance<Env extends Environment = Environment> {
 
 	eval() {
 		console.log(this.formula.toString());
-		const evaluator = new ValueEvaluator(this.environment);
-		return this.formula.visit(evaluator);
+		const interpreter = new SimpleInterpreter(this.environment);
+		return this.formula.visit(interpreter);
 	}
 }
 
-class ValueEvaluator implements Visitor<Value> {
+class SimpleInterpreter implements Visitor<Value> {
 	constructor(public env: Environment) {}
 
 	visitEmptyExpr(): Value {
@@ -93,6 +93,10 @@ class ValueEvaluator implements Visitor<Value> {
 				return new BooleanValue(left.asNumber() <= right.asNumber());
 			case ">=":
 				return new BooleanValue(left.asNumber() >= right.asNumber());
+			case "&&":
+				return new BooleanValue(left.asBoolean() && right.asBoolean());
+			case "||":
+				return new BooleanValue(left.asBoolean() || right.asBoolean());
 			default:
 				throw new Error(`Op not supported yet: ${expr.operator}`);
 		}

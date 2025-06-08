@@ -5,14 +5,12 @@ import {
 	type EnvDefineConfig,
 } from "./language/index.js";
 import { BooleanValue, NumberValue, StringValue } from "./language/value.js";
-import { Lexer } from "./parser/lexer.js";
-import { Parser } from "./parser/parse.js";
 import { FormulaRuntime } from "./runtime.js";
 
 let source1 = new MockDataSource({
 	Age: {
 		"1": 20,
-		"2": 12,
+		"2": 11,
 	},
 	Name: {
 		"1": "Alice",
@@ -66,19 +64,26 @@ class RowEnvironment extends Environment {
 	};
 }
 
+/*
+ Todo 
+ - support (10).thing().thing()
+ - support "String".methods()
+ - support thing()() ?
+*/
+
 const src = `
- if(
-		prop("Age") >= 18, 
-		concat(prop("Name"), " is ", "Adult"), 
-		concat(prop("Name"), " is ", "Minor")
- ) 
+if(
+	prop("Age") >= 18, 
+	concat(prop("Name"), " is ", "Adult"),
+	if(
+		prop("Age") >= 10,
+		concat(prop("Name"), " is ", "Teenager"),
+		concat(prop("Name"), " is ", "Child")
+	)
+)
 `.trim();
 
-// const lexer = new Lexer(src);
-// const tokens = [...lexer].map((t) => t.toString());
-// console.log(tokens.join("\n"));
-
-// gives functions like `if`..
+// gives functions like `if`, 'concat' etc..
 let rt = new FormulaRuntime();
 rt.define({
 	type: "function",
@@ -88,6 +93,7 @@ rt.define({
 		return new StringValue(new Date().toDateString());
 	},
 });
+
 // for each database create a new environment
 let sourceEnv = new DataViewFormulaEnvironment(source1);
 const [formula, error] = new Formula("Test Formula", src).compileSafe();
