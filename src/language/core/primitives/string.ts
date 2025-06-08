@@ -1,12 +1,13 @@
 import {
 	AddTrait,
 	DivTrait,
+	EqTrait,
 	MulTrait,
+	Ordering,
+	OrdTrait,
+	RemTrait,
 	SubTrait,
-	type Add,
-	type Div,
-	type Mul,
-	type Sub,
+	type Eq,
 } from "../op.js";
 import { BaseValue, type Value } from "../value.js";
 import { NumberValue } from "./number.js";
@@ -33,28 +34,34 @@ export class StringValue extends BaseValue {
 	isNone(): boolean {
 		return false;
 	}
+
+	static add(me: Value, other: Value): StringValue {
+		return new StringValue(me.asString() + other.asString());
+	}
+
+	static cmp(me: Value, other: Value): Ordering {
+		if (me instanceof StringValue && other instanceof StringValue) {
+			const a = me.asString();
+			const b = other.asString();
+			return a === b ? Ordering.Eq : a < b ? Ordering.Lt : Ordering.Gt;
+		}
+		return NumberValue.cmp(me, other);
+	}
+
+	static eq(me: StringValue, other: Value): boolean {
+		if (!StringValue.is(other)) {
+			throw new Error(
+				`First parameter to StringValue.eq must be a StringValue but got ${other.typeHint}`
+			);
+		}
+		return other instanceof StringValue && me.value === other.value;
+	}
 }
 
-StringValue.addImpl<Add<StringValue>>(AddTrait, {
-	add: (me, other): StringValue => {
-		return new StringValue(me.asString() + other.asString());
-	},
-});
-
-StringValue.addImpl<Sub<StringValue>>(SubTrait, {
-	sub: (me, other): Value => {
-		return NumberValue.getImpl(SubTrait).sub(me, other);
-	},
-});
-
-StringValue.addImpl<Mul<StringValue>>(MulTrait, {
-	mul: (me, other): Value => {
-		return NumberValue.getImpl(MulTrait).mul(me, other);
-	},
-});
-
-StringValue.addImpl<Div<StringValue>>(DivTrait, {
-	div: (me, other): Value => {
-		return NumberValue.getImpl(DivTrait).div(me, other);
-	},
-});
+StringValue.addImpl(AddTrait, StringValue);
+StringValue.addImpl(SubTrait, NumberValue);
+StringValue.addImpl(MulTrait, NumberValue);
+StringValue.addImpl(DivTrait, NumberValue);
+StringValue.addImpl(RemTrait, NumberValue);
+StringValue.addImpl(OrdTrait, StringValue);
+StringValue.addImpl<Eq<StringValue>>(EqTrait, StringValue);

@@ -1,16 +1,15 @@
 import {
 	AddTrait,
 	DivTrait,
+	EqTrait,
 	MulTrait,
+	OrdTrait,
+	RemTrait,
 	SubTrait,
-	type Add,
-	type Div,
-	type Mul,
-	type Sub,
+	type Eq,
 } from "../op.js";
 import { BaseValue, type Value } from "../value.js";
 import { NumberValue } from "./number.js";
-import { StringValue } from "./string.js";
 
 export class BooleanValue extends BaseValue {
 	readonly typeHint: string = "Boolean";
@@ -34,31 +33,21 @@ export class BooleanValue extends BaseValue {
 	isNone(): boolean {
 		return false;
 	}
+
+	static eq(me: BooleanValue, other: Value): boolean {
+		if (!BooleanValue.is(other)) {
+			throw new Error(
+				`First parameter to BooleanValue.eq must be a BooleanValue but got ${other.typeHint}`
+			);
+		}
+		return other instanceof BooleanValue && me.value === other.value;
+	}
 }
 
-BooleanValue.addImpl<Add<BooleanValue>>(AddTrait, {
-	add: (me, other): Value => {
-		if (other instanceof StringValue) {
-			return StringValue.getImpl(AddTrait).add(me, other);
-		}
-		return NumberValue.getImpl(AddTrait).add(me, other);
-	},
-});
-
-BooleanValue.addImpl<Sub<BooleanValue>>(SubTrait, {
-	sub: (me, other): Value => {
-		return NumberValue.getImpl(SubTrait).sub(me, other);
-	},
-});
-
-BooleanValue.addImpl<Mul<BooleanValue>>(MulTrait, {
-	mul: (me, other): Value => {
-		return NumberValue.getImpl(MulTrait).mul(me, other);
-	},
-});
-
-BooleanValue.addImpl<Div<BooleanValue>>(DivTrait, {
-	div: (me, other): Value => {
-		return NumberValue.getImpl(DivTrait).div(me, other);
-	},
-});
+BooleanValue.addImpl(AddTrait, NumberValue);
+BooleanValue.addImpl(SubTrait, NumberValue);
+BooleanValue.addImpl(MulTrait, NumberValue);
+BooleanValue.addImpl(DivTrait, NumberValue);
+BooleanValue.addImpl(RemTrait, NumberValue);
+BooleanValue.addImpl(OrdTrait, NumberValue);
+BooleanValue.addImpl<Eq<BooleanValue>>(EqTrait, BooleanValue);

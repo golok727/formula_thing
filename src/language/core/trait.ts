@@ -18,7 +18,10 @@ export type ValueConstructor = new (...args: any[]) => Value;
 
 const traitMap: Map<ValueConstructor, Map<string, any>> = new Map();
 
-export function getImpl<T>(ctor: ValueConstructor, trait: Trait<T>): T {
+export function getImpl<T>(
+	ctor: ValueConstructor,
+	trait: Trait<T>
+): Readonly<T> {
 	if (!traitMap.has(ctor)) {
 		throw new Error(`No traits defined for ${ctor.name}.`);
 	}

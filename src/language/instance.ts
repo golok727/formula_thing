@@ -20,6 +20,9 @@ import {
 	SubTrait,
 	MulTrait,
 	DivTrait,
+	RemTrait,
+	OrdTrait,
+	EqTrait,
 } from "./core/index.js";
 
 export class Instance<Env extends Environment = Environment> {
@@ -73,8 +76,12 @@ class SimpleInterpreter implements Visitor<Value> {
 		const left = expr.left.visit(this);
 		const right = expr.right.visit(this);
 		switch (expr.operator) {
-			case "+":
+			case "+": {
+				if (left instanceof StringValue || right instanceof StringValue) {
+					return StringValue.add(left, right);
+				}
 				return left.getImpl(AddTrait).add(left, right);
+			}
 			case "-":
 				return left.getImpl(SubTrait).sub(left, right);
 			case "*":
@@ -82,21 +89,44 @@ class SimpleInterpreter implements Visitor<Value> {
 			case "/":
 				return left.getImpl(DivTrait).div(left, right);
 			case "%":
-				return new NumberValue(left.asNumber() % right.asNumber());
-			case "<":
-				return new BooleanValue(left.asNumber() < right.asNumber());
-			case ">":
-				return new BooleanValue(left.asNumber() > right.asNumber());
-			case "<=":
-				return new BooleanValue(left.asNumber() <= right.asNumber());
-			case ">=":
-				return new BooleanValue(left.asNumber() >= right.asNumber());
+				return left.getImpl(RemTrait).rem(left, right);
+			case "<": {
+				const ord = left.getImpl(OrdTrait).cmp(left, right);
+				return new BooleanValue(ord < 0);
+			}
+			case ">": {
+				const ord = left.getImpl(OrdTrait).cmp(left, right);
+				return new BooleanValue(ord > 0);
+			}
+			case "<=": {
+				const ord = left.getImpl(OrdTrait).cmp(left, right);
+				return new BooleanValue(ord <= 0);
+			}
+			case ">=": {
+				const ord = left.getImpl(OrdTrait).cmp(left, right);
+				return new BooleanValue(ord >= 0);
+			}
+			case "==": {
+				// hack
+				try {
+					return new BooleanValue(left.getImpl(EqTrait).eq(left, right));
+				} catch (e) {
+					return new BooleanValue(false);
+				}
+			}
+			case "!=": {
+				try {
+					return new BooleanValue(!left.getImpl(EqTrait).eq(left, right));
+				} catch (e) {
+					return new BooleanValue(true);
+				}
+			}
 			case "&&":
 				return new BooleanValue(left.asBoolean() && right.asBoolean());
 			case "||":
 				return new BooleanValue(left.asBoolean() || right.asBoolean());
 			default:
-				throw new Error(`Op not supported yet: ${expr.operator}`);
+				throw new Error(`Invalid Operator ${expr.operator}`);
 		}
 	}
 

@@ -13,7 +13,7 @@ export interface Value {
 	asNumber(): number;
 	isNone(): boolean;
 
-	getImpl<T>(trait: Trait<T>): T;
+	getImpl<T>(trait: Trait<T>): Readonly<T>;
 }
 
 export abstract class BaseValue implements Value {
@@ -34,6 +34,7 @@ export abstract class BaseValue implements Value {
 
 	static addImpl<T>(trait: Trait<T>, impl: T, replace?: boolean) {
 		addImpl<T>(this as unknown as ValueConstructor, trait, impl, replace);
+		return this;
 	}
 
 	static is(value: Value): boolean {
