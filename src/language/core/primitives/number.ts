@@ -9,6 +9,7 @@ import {
 	type Sub,
 } from "../op.js";
 import { BaseValue, type Value } from "../value.js";
+import { StringValue } from "./string.js";
 
 export class NumberValue extends BaseValue {
 	readonly typeHint: string = "Number";
@@ -22,7 +23,7 @@ export class NumberValue extends BaseValue {
 	}
 
 	asBoolean(): boolean {
-		return this.value !== 0;
+		return !this.value;
 	}
 
 	asNumber(): number {
@@ -36,10 +37,11 @@ export class NumberValue extends BaseValue {
 
 NumberValue.addImpl<Add<NumberValue>>(AddTrait, {
 	add: (me, other): Value => {
-		if (other instanceof NumberValue) {
-			return new NumberValue(me.value + other.value);
+		if (other instanceof StringValue) {
+			return StringValue.getImpl(AddTrait).add(me, other);
 		}
-		return other.getImpl(AddTrait).add(me, other);
+
+		return new NumberValue(me.asNumber() + other.asNumber());
 	},
 });
 
@@ -57,6 +59,6 @@ NumberValue.addImpl<Mul<NumberValue>>(MulTrait, {
 
 NumberValue.addImpl<Div<NumberValue>>(DivTrait, {
 	div: (me, other): NumberValue => {
-		return new NumberValue(me.asNumber() + other.asNumber());
+		return new NumberValue(me.asNumber() / other.asNumber());
 	},
 });

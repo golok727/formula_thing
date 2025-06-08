@@ -10,6 +10,7 @@ import {
 } from "../op.js";
 import { BaseValue, type Value } from "../value.js";
 import { NumberValue } from "./number.js";
+import { StringValue } from "./string.js";
 
 export class BooleanValue extends BaseValue {
 	readonly typeHint: string = "Boolean";
@@ -37,27 +38,27 @@ export class BooleanValue extends BaseValue {
 
 BooleanValue.addImpl<Add<BooleanValue>>(AddTrait, {
 	add: (me, other): Value => {
-		return new NumberValue(me.asNumber() + other.asNumber());
+		if (other instanceof StringValue) {
+			return StringValue.getImpl(AddTrait).add(me, other);
+		}
+		return NumberValue.getImpl(AddTrait).add(me, other);
 	},
 });
 
 BooleanValue.addImpl<Sub<BooleanValue>>(SubTrait, {
 	sub: (me, other): Value => {
-		return new NumberValue(me.asNumber() - other.asNumber());
+		return NumberValue.getImpl(SubTrait).sub(me, other);
 	},
 });
 
 BooleanValue.addImpl<Mul<BooleanValue>>(MulTrait, {
 	mul: (me, other): Value => {
-		return new NumberValue(me.asNumber() * other.asNumber());
+		return NumberValue.getImpl(MulTrait).mul(me, other);
 	},
 });
 
 BooleanValue.addImpl<Div<BooleanValue>>(DivTrait, {
 	div: (me, other): Value => {
-		if (other.asNumber() === 0) {
-			return new NumberValue(NaN);
-		}
-		return new NumberValue(me.asNumber() / other.asNumber());
+		return NumberValue.getImpl(DivTrait).div(me, other);
 	},
 });

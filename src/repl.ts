@@ -38,7 +38,7 @@ while (running) {
 
 	try {
 		let res = evaluateFormula(input, runtime);
-		console.log(res.asString());
+		console.log(`(${res.typeHint}): `, res.asString());
 	} catch (err) {
 		console.error("Error:", err);
 	}

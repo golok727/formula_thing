@@ -24,14 +24,19 @@ export abstract class BaseValue implements Value {
 	abstract asNumber(): number;
 	abstract isNone(): boolean;
 
-	// add  this and other values together
-	// only use this if this has a trait implementation or it will throw an error
-
 	getImpl<T>(trait: Trait<T>): T {
 		return getImpl<T>(this.constructor as ValueConstructor, trait);
 	}
 
+	static getImpl<T>(trait: Trait<T>): T {
+		return getImpl<T>(this as unknown as ValueConstructor, trait);
+	}
+
 	static addImpl<T>(trait: Trait<T>, impl: T, replace?: boolean) {
 		addImpl<T>(this as unknown as ValueConstructor, trait, impl, replace);
+	}
+
+	static is(value: Value): boolean {
+		return value instanceof this;
 	}
 }

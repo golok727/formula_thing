@@ -14,7 +14,7 @@ export type Div<T extends Value = Value> = {
 	div(me: T, other: Value): Value;
 };
 
-export const AddTrait = defineTrait<Add>("OpAddTrait");
-export const SubTrait = defineTrait<Sub>("OpSubTrait");
-export const MulTrait = defineTrait<Mul>("OpMulTrait");
-export const DivTrait = defineTrait<Div>("OpDivTrait");
+export const AddTrait = defineTrait<Add>("_core_AddTrait");
+export const SubTrait = defineTrait<Sub>("_core_SubTrait");
+export const MulTrait = defineTrait<Mul>("_core_MulTrait");
+export const DivTrait = defineTrait<Div>("_core_DivTrait");
