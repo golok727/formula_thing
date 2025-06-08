@@ -2,7 +2,7 @@ import { Arguments } from "./arguments.js";
 import type { Formula } from "./formula.ts";
 import { Instance } from "./instance.js";
 import type { EnvDefineConfig, FunctionDefinition } from "./types.js";
-import { None, type Value } from "./core/value.js";
+import { None, type Value } from "./core/index.js";
 
 export class Fn {
 	constructor(

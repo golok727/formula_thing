@@ -16,7 +16,7 @@ import {
 	NumberValue,
 	StringValue,
 	type Value,
-} from "./core/value.js";
+} from "./core/index.js";
 
 export class Instance<Env extends Environment = Environment> {
 	constructor(

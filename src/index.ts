@@ -1,15 +1,12 @@
 import { MockDataSource, type DataSource } from "./__mock.js";
 import {
+	BooleanValue,
+	NumberValue,
+	StringValue,
 	Environment,
 	Formula,
 	type EnvDefineConfig,
 } from "./language/index.js";
-import {
-	BooleanValue,
-	NumberValue,
-	StringValue,
-} from "./language/core/value.js";
-import { Lexer } from "./parser/lexer.js";
 import { FormulaRuntime } from "./std/runtime.js";
 
 let source1 = new MockDataSource({

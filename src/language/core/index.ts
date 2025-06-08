@@ -2,3 +2,4 @@ export * from "./op.js";
 export * from "./convert.js";
 export * from "./value.js";
 export * from "./trait.js";
+export * from "./primitives/index.js";

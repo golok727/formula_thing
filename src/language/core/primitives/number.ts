@@ -1,4 +1,4 @@
-import { BaseValue } from "../../language/core/value.js";
+import { BaseValue } from "../value.js";
 
 export class NumberValue extends BaseValue {
 	readonly typeHint: string = "number";

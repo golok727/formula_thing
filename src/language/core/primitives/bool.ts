@@ -1,4 +1,5 @@
-import { BaseValue, OpAddTraitId, type Value } from "../../language/index.js";
+import { OpAddTraitId } from "../op.js";
+import { BaseValue, type Value } from "../value.js";
 
 export class BooleanValue extends BaseValue {
 	readonly typeHint: string = "boolean";

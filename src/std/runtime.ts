@@ -1,6 +1,6 @@
 import { Environment } from "../language/environment.js";
 import type { EnvDefineConfig } from "../language/types.js";
-import { StringValue } from "../language/core/value.js";
+import { StringValue } from "../language/core/index.js";
 
 /**
  * This environment provides the standard library functions
