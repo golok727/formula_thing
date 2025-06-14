@@ -7,7 +7,6 @@ import type {
 	VariableDefinition,
 } from "./types.js";
 import { BaseValue, CallTrait, None, type Value } from "./core/index.js";
-import { CallExpr } from "../ast.js";
 
 export class Fn extends BaseValue {
 	typeHint: string = "Fn";

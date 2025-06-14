@@ -36,4 +36,12 @@ export abstract class BaseValue implements Value {
 		addImpl<T>(this as unknown as ValueConstructor, trait, impl, replace);
 		return this;
 	}
+
+	toString(): string {
+		return this.asString();
+	}
+
+	static is(val: unknown): val is BaseValue {
+		return val instanceof BaseValue;
+	}
 }
