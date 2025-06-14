@@ -6,20 +6,50 @@ import type {
 	FunctionDefinition,
 	VariableDefinition,
 } from "./types.js";
-import { None, type Value } from "./core/index.js";
+import { BaseValue, CallTrait, None, type Value } from "./core/index.js";
+import { CallExpr } from "../ast.js";
 
-export class Fn {
+export class Fn extends BaseValue {
+	typeHint: string = "Fn";
+
+	asString(): string {
+		return `[Function: ${this.define.linkname}]`;
+	}
+
+	asBoolean(): boolean {
+		return true;
+	}
+	asNumber(): number {
+		return NaN;
+	}
+
+	isNone(): boolean {
+		return false;
+	}
+
 	constructor(
 		public define: FunctionDefinition,
 		public readonly env: Environment
-	) {}
+	) {
+		super();
+	}
 
 	call(args: Value[]): Value {
 		return this.define.fn(this.env, new Arguments(args)) ?? None;
 	}
 }
+Fn.addImpl(CallTrait, {
+	call(me: Value, _: Environment, args: Value[]) {
+		if (!(me instanceof Fn)) {
+			throw new Error(
+				`First parameter to Fn.call must be a Fn but got ${me.typeHint}`
+			);
+		}
+		return me.call(args);
+	},
+});
+
 export class Environment {
-	private _functions: Map<string, Fn> = new Map();
 	private _variables: Map<string, VariableDefinition> = new Map();
 
 	protected _parent: Environment | null = null;
@@ -32,7 +62,7 @@ export class Environment {
 		this._parent = parent;
 	}
 
-	getVariable(name: string): Value | null {
+	get(name: string): Value | null {
 		const variable = this._variables.get(name);
 		if (variable) {
 			if (typeof variable.getValue === "function") {
@@ -41,38 +71,24 @@ export class Environment {
 				return variable.getValue;
 			}
 		} else {
-			return this._parent?.getVariable(name) ?? null;
+			return this._parent?.get(name) ?? null;
 		}
-	}
-
-	getFunction(linkname: string): Fn | null {
-		// todo cache ?
-		return (this._functions.get(linkname) ??
-			this._parent?.getFunction(linkname) ??
-			null) as never;
 	}
 
 	define(def: EnvDefineConfig<this>): this {
 		if (def.type === "function") {
-			// todo name validation
-			// we need parent check as well
-			if (this._functions.has(def.linkname)) {
-				throw new Error(
-					`Function '${def.linkname}' is already defined in this environment.`
-				);
-			}
-			this._functions.set(
-				def.linkname,
-				new Fn(def as FunctionDefinition, this) as never as Fn
-			);
+			this.define({
+				type: "variable",
+				linkName: def.linkname,
+				description: def.description,
+				override: false,
+				getValue: new Fn(def as FunctionDefinition, this),
+			});
 		} else if (def.type === "variable") {
-			// todo name validation
-			if (this._variables.has(def.name)) {
-				throw new Error(
-					`Variable '${def.name}' is already defined in this environment.`
-				);
+			if (!def.override && this._variables.has(def.linkName)) {
+				throw new Error(`Name '${def.linkName}' is already defined.`);
 			}
-			this._variables.set(def.name, def as VariableDefinition);
+			this._variables.set(def.linkName, def as VariableDefinition);
 		}
 
 		return this;

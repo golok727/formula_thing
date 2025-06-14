@@ -6,15 +6,19 @@ export class NoneValue extends BaseValue {
 	constructor() {
 		super();
 	}
+
 	asString(): string {
 		return "None";
 	}
+
 	asBoolean(): boolean {
 		return false;
 	}
+
 	asNumber(): number {
 		return 0;
 	}
+
 	isNone(): boolean {
 		return true;
 	}
@@ -27,6 +31,10 @@ export class NoneValue extends BaseValue {
 		}
 
 		return new BooleanValue(other instanceof NoneValue);
+	}
+
+	static is(val: unknown): val is NoneValue {
+		return val instanceof NoneValue;
 	}
 }
 

@@ -1,3 +1,5 @@
+import type { Arguments } from "../arguments.js";
+import type { Environment } from "../environment.js";
 import type { BooleanValue } from "./primitives/bool.js";
 import { defineTrait } from "./trait.js";
 import type { Value } from "./value.js";
@@ -37,6 +39,9 @@ export type Neg<T extends Value = Value> = {
 export type Not<T extends Value = Value> = {
 	not(me: T): BooleanValue;
 };
+export type Call<T extends Value = Value> = {
+	call(me: T, callEnv: Environment, args: Value[]): Value;
+};
 
 export const AddTrait = defineTrait<Add>("_core_AddTrait");
 export const SubTrait = defineTrait<Sub>("_core_SubTrait");
@@ -47,3 +52,4 @@ export const OrdTrait = defineTrait<Ord>("_core_OrdTrait");
 export const EqTrait = defineTrait<Eq>("_core_EqTrait");
 export const NegTrait = defineTrait<Neg>("_core_NegTrait");
 export const NotTrait = defineTrait<Not>("_core_NotTrait");
+export const CallTrait = defineTrait<Call>("_core_CallTrait");

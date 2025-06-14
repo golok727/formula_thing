@@ -5,7 +5,6 @@ import {
 	StringValue,
 	Environment,
 	Formula,
-	type EnvDefineConfig,
 	type FunctionDefinition,
 } from "./language/index.js";
 import { FormulaRuntime } from "./std/runtime.js";

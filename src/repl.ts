@@ -9,6 +9,23 @@ let running = true;
 const runtime = new FormulaRuntime();
 runtime.define({
 	type: "function",
+	linkname: "__def__",
+	fn: (env, args) => {
+		const defName = args.get(0).asString();
+		const value = args.get(1);
+
+		env.define({
+			type: "variable",
+			linkName: defName,
+			override: true,
+			getValue: value,
+		});
+
+		return value;
+	},
+});
+runtime.define({
+	type: "function",
 	description: "Get the current time",
 	linkname: "now",
 	fn: () => {

@@ -1,17 +1,4 @@
-import {
-	AddTrait,
-	DivTrait,
-	EqTrait,
-	MulTrait,
-	NegTrait,
-	NotTrait,
-	OrdTrait,
-	RemTrait,
-	SubTrait,
-	type Eq,
-} from "../op.js";
 import { BaseValue, type Value } from "../value.js";
-import { NumberValue } from "./number.js";
 
 export class BooleanValue extends BaseValue {
 	readonly typeHint: string = "Boolean";
@@ -54,5 +41,9 @@ export class BooleanValue extends BaseValue {
 
 	static not(me: Value): BooleanValue {
 		return new BooleanValue(!me.asBoolean());
+	}
+
+	static is(val: unknown): val is BooleanValue {
+		return val instanceof BooleanValue;
 	}
 }

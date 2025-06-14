@@ -36,8 +36,4 @@ export abstract class BaseValue implements Value {
 		addImpl<T>(this as unknown as ValueConstructor, trait, impl, replace);
 		return this;
 	}
-
-	static is(value: Value): boolean {
-		return value instanceof this;
-	}
 }

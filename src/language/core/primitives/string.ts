@@ -1,16 +1,4 @@
-import {
-	AddTrait,
-	DivTrait,
-	EqTrait,
-	MulTrait,
-	NegTrait,
-	NotTrait,
-	Ordering,
-	OrdTrait,
-	RemTrait,
-	SubTrait,
-	type Eq,
-} from "../op.js";
+import { Ordering } from "../op.js";
 import { BaseValue, type Value } from "../value.js";
 import { BooleanValue } from "./index.js";
 import { NumberValue } from "./index.js";
@@ -60,5 +48,9 @@ export class StringValue extends BaseValue {
 		return new BooleanValue(
 			other instanceof StringValue && me.value === other.value
 		);
+	}
+
+	static is(val: unknown): val is StringValue {
+		return val instanceof StringValue;
 	}
 }

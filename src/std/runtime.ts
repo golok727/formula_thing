@@ -24,7 +24,7 @@ export class FormulaRuntime extends Environment {
 		});
 		this.define({
 			type: "variable",
-			name: "None",
+			linkName: "None",
 			description: "Represents a None value, similar to null or undefined.",
 			getValue: () => None,
 		});
