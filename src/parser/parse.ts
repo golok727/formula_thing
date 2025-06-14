@@ -121,7 +121,7 @@ export class Parser {
 		return member;
 	}
 
-	private _parseIdent(): Expr {
+	private _parseIdent(): Ident {
 		const token = this._nextToken(); // consume the identifier
 		if (!token || token.kind !== TokenKind.Ident) {
 			throw new Error(
@@ -130,14 +130,7 @@ export class Parser {
 		}
 
 		const name = token.source(this.source);
-		const ident = new Ident(name, token.span);
-
-		if (this._nextIs(TokenKind.LParen)) {
-			return this._parseFnCall(ident);
-		} else if (this._nextIs(TokenKind.Dot)) {
-			return this._parseMemberExpr(ident);
-		}
-		return ident;
+		return new Ident(name, token.span);
 	}
 
 	// Parse a single unit of expression
@@ -162,7 +155,15 @@ export class Parser {
 					);
 				}
 				case TokenKind.Ident: {
-					return this._parseIdent();
+					const ident = this._parseIdent();
+
+					if (this._nextIs(TokenKind.LParen)) {
+						return this._parseFnCall(ident);
+					} else if (this._nextIs(TokenKind.Dot)) {
+						return this._parseMemberExpr(ident);
+					}
+
+					return ident;
 				}
 				case TokenKind.Boolean: {
 					const token = this._nextToken()!; // consume the literal
