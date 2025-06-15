@@ -6,6 +6,7 @@ import { StringValueImpl } from "./impl.js";
 import { StringValue } from "./string.js";
 
 export * from "./string.js";
+export * from "./impl.js";
 
 implCoreArithmetic(StringValue);
 
@@ -17,6 +18,9 @@ StringValue.addImpl(AddTrait, StringValueImpl, /* Replace*/ true)
 StringValue.addImpl(NotTrait, BoolValueImpl);
 
 implPropertyAccessor(StringValue, {
-	length: (me: StringValue) => new NumberValue(me.length),
+	len: (me: StringValue) => new NumberValue(me.length),
 	trim: (me: StringValue) => me.trim,
+	upper: (me: StringValue) => me.upper,
+	lower: (me: StringValue) => me.lower,
+	slice: (me: StringValue) => me.slice,
 });

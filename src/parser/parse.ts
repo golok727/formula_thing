@@ -69,12 +69,7 @@ export class Parser {
 		});
 
 		const fn = new CallExpr(callee, args, span(0, 0));
-
-		if (this._nextIs(TokenKind.Dot)) {
-			return this._parseMemberExpr(fn);
-		}
-
-		return fn;
+		return this._tryParsePostFixExpr(fn);
 	}
 
 	private _parseSeriesOf<T>(
@@ -115,11 +110,8 @@ export class Parser {
 		const token = this._nextToken()!; // consume the identifier
 		let property = new Ident(token.source(this.source), token.span);
 		let member = new MemberExpr(referer, property, token.span);
-		if (this._nextIs(TokenKind.LParen)) {
-			return this._parseFnCall(member);
-		}
-		// todo Lbracket for array access
-		return member;
+
+		return this._tryParsePostFixExpr(member);
 	}
 
 	private _parseIdent(): Ident {
@@ -134,9 +126,20 @@ export class Parser {
 		return new Ident(name, token.span);
 	}
 
+	private _tryParsePostFixExpr(prefix: Expr): Expr {
+		if (this._nextIs(TokenKind.LParen)) {
+			return this._parseFnCall(prefix);
+		} else if (this._nextIs(TokenKind.Dot)) {
+			return this._parseMemberExpr(prefix);
+		}
+		// todo index access
+		return prefix;
+	}
+
 	// Parse a single unit of expression
 	private _parseExprUnit(): Expr | null {
-		if (this.t0) {
+		const parseExprUnit = () => {
+			if (!this.t0) return null;
 			switch (this.t0.kind) {
 				case TokenKind.Number: {
 					const token = this._nextToken()!; // consume the literal
@@ -157,14 +160,7 @@ export class Parser {
 				}
 				case TokenKind.Ident: {
 					const ident = this._parseIdent();
-
-					if (this._nextIs(TokenKind.LParen)) {
-						return this._parseFnCall(ident);
-					} else if (this._nextIs(TokenKind.Dot)) {
-						return this._parseMemberExpr(ident);
-					}
-
-					return ident;
+					return this._tryParsePostFixExpr(ident);
 				}
 				case TokenKind.Boolean: {
 					const token = this._nextToken()!; // consume the literal
@@ -203,8 +199,11 @@ export class Parser {
 				default:
 					return null;
 			}
-		}
-		return null;
+		};
+
+		const expr = parseExprUnit();
+
+		return expr ? this._tryParsePostFixExpr(expr) : expr;
 	}
 
 	private getOpPrecedence(kind: TokenKind | null) {
@@ -215,10 +214,6 @@ export class Parser {
 	}
 
 	private _parseExpr(): Expr | null {
-		if (this._isEof()) {
-			return null;
-		}
-
 		const exprStack: Expr[] = [];
 		const opStack: OpWithPrecedence[] = [];
 
@@ -230,7 +225,7 @@ export class Parser {
 			} else if (exprStack.length === 0) {
 				return null;
 			} else {
-				throw new Error("Op naked right");
+				throw new Error(`Expected a expression after operator`);
 			}
 
 			const mayBeOp = this.t0;

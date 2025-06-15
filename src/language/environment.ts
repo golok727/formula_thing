@@ -36,7 +36,7 @@ export class Environment {
 				linkName: def.linkname,
 				description: def.description,
 				override: false,
-				getValue: new Fn((args) => def.fn(this, args) ?? None),
+				getValue: new Fn((args) => def.fn(this, args) ?? None, def.linkname),
 			});
 		} else if (def.type === "value") {
 			if (!def.override && this._values.has(def.linkName)) {

@@ -1,3 +1,4 @@
+import type { Arguments } from "../../../arguments.js";
 import { BaseValue, type Value } from "../../value.js";
 import { Fn } from "../fn/fn.js";
 
@@ -8,7 +9,29 @@ export class StringValue extends BaseValue {
 		return this.value.length;
 	}
 
-	readonly trim = new Fn(() => new StringValue(this.value.trim()));
+	readonly trim = new Fn(() => new StringValue(this.value.trim()), "trim");
+
+	readonly slice = new Fn((args: Arguments) => {
+		const start = args.get(0);
+		const end = args.get(1);
+
+		return new StringValue(
+			this.value.slice(
+				start.asNumber(),
+				end.isNone() ? undefined : end.asNumber()
+			)
+		);
+	}, "slice");
+
+	readonly upper = new Fn(
+		() => new StringValue(this.value.toUpperCase()),
+		"upper"
+	);
+
+	readonly lower = new Fn(
+		() => new StringValue(this.value.toLowerCase()),
+		"lower"
+	);
 
 	constructor(public readonly value: string) {
 		super();

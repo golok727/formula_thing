@@ -1,6 +1,11 @@
 import { Environment } from "../language/environment.js";
-import type { EnvDefineConfig, FunctionDefinition } from "../language/types.js";
-import { None, StringValue } from "../language/core/index.js";
+import type { FunctionDefinition } from "../language/types.js";
+import {
+	BooleanValue,
+	None,
+	NumberValue,
+	StringValue,
+} from "../language/core/index.js";
 
 /**
  * This environment provides the standard library functions
@@ -8,6 +13,7 @@ import { None, StringValue } from "../language/core/index.js";
 export class FormulaRuntime extends Environment {
 	constructor() {
 		super(null);
+
 		this.define({
 			type: "function",
 			linkname: "if",
@@ -15,6 +21,7 @@ export class FormulaRuntime extends Environment {
 				"Conditional function that executes one of two branches based on a condition. \n\nUsage: `if(condition, trueBranch, falseBranch)`",
 			fn: FormulaRuntime._if,
 		});
+
 		this.define({
 			type: "function",
 			linkname: "concat",
@@ -22,6 +29,28 @@ export class FormulaRuntime extends Environment {
 				"Concatenates multiple string values into a single string. \n\nUsage: `concat(value1, value2, ...)`",
 			fn: FormulaRuntime._concat,
 		});
+
+		this.define({
+			type: "function",
+			linkname: "string",
+			description: "convert a value to a string",
+			fn: FormulaRuntime._string,
+		});
+
+		this.define({
+			type: "function",
+			linkname: "number",
+			description: "convert a value to a number",
+			fn: FormulaRuntime._number,
+		});
+
+		this.define({
+			type: "function",
+			linkname: "bool",
+			description: "convert a value to a boolean",
+			fn: FormulaRuntime._bool,
+		});
+
 		this.define({
 			type: "value",
 			linkName: "None",
@@ -29,6 +58,39 @@ export class FormulaRuntime extends Environment {
 			getValue: () => None,
 		});
 	}
+
+	private static _bool: FunctionDefinition<FormulaRuntime>["fn"] = (
+		_,
+		args
+	) => {
+		if (args.length <= 0) {
+			throw new Error("bool() function requires at least one argument.");
+		}
+		const a = args.get(0);
+		return new BooleanValue(a.asBoolean());
+	};
+
+	private static _number: FunctionDefinition<FormulaRuntime>["fn"] = (
+		_,
+		args
+	) => {
+		if (args.length <= 0) {
+			throw new Error("number() function requires at least one argument.");
+		}
+		const a = args.get(0);
+		return new NumberValue(a.asNumber());
+	};
+
+	private static _string: FunctionDefinition<FormulaRuntime>["fn"] = (
+		_,
+		args
+	) => {
+		if (args.length <= 0) {
+			throw new Error("string() function requires at least one argument.");
+		}
+		const a = args.get(0);
+		return new StringValue(a.asString());
+	};
 
 	private static _concat: FunctionDefinition<FormulaRuntime>["fn"] = (
 		_,

@@ -5,8 +5,6 @@ import { None } from "../none/index.js";
 export class Fn extends BaseValue {
 	typeHint: string = "Fn";
 
-	name: string = "anonymous";
-
 	asString(): string {
 		return `[Function: ${this.name}]`;
 	}
@@ -22,7 +20,10 @@ export class Fn extends BaseValue {
 		return false;
 	}
 
-	constructor(public readonly fn: (args: Arguments) => Value) {
+	constructor(
+		public readonly fn: (args: Arguments) => Value,
+		public readonly name = "anonymous"
+	) {
 		super();
 	}
 
