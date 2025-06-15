@@ -20,9 +20,10 @@ import {
 } from "./core/index.js";
 import {
 	ArrayExpr,
+	BinaryExpr,
+	BinaryOp,
 	Ident,
 	MemberExpr,
-	type BinaryExpr,
 	type CallExpr,
 	type LiteralExpr,
 	type UnaryExpr,
@@ -67,48 +68,50 @@ export class Evaluator implements Visitor<Value> {
 		const left = expr.left.visit(this);
 		const right = expr.right.visit(this);
 		switch (expr.operator) {
-			case "+": {
+			case BinaryOp.Add: {
 				if (left instanceof StringValue || right instanceof StringValue) {
 					return StringValueImpl.add(left, right);
 				}
 				return left.getImpl(AddTrait).add(left, right);
 			}
-			case "-":
+			case BinaryOp.Sub:
 				return left.getImpl(SubTrait).sub(left, right);
-			case "*":
+			case BinaryOp.Mul:
 				return left.getImpl(MulTrait).mul(left, right);
-			case "/":
+			case BinaryOp.Div:
 				return left.getImpl(DivTrait).div(left, right);
-			case "%":
+			case BinaryOp.Mod:
 				return left.getImpl(RemTrait).rem(left, right);
-			case "<": {
+			case BinaryOp.Lt: {
 				const ord = left.getImpl(OrdTrait).cmp(left, right);
 				return new BooleanValue(ord < 0);
 			}
-			case ">": {
+			case BinaryOp.Gt: {
 				const ord = left.getImpl(OrdTrait).cmp(left, right);
 				return new BooleanValue(ord > 0);
 			}
-			case "<=": {
+			case BinaryOp.LtEq: {
 				const ord = left.getImpl(OrdTrait).cmp(left, right);
 				return new BooleanValue(ord <= 0);
 			}
-			case ">=": {
+			case BinaryOp.GtEq: {
 				const ord = left.getImpl(OrdTrait).cmp(left, right);
 				return new BooleanValue(ord >= 0);
 			}
-			case "==": {
+			case BinaryOp.Eq: {
 				// todo handle errors for non impl
 				return left.getImpl(EqTrait).eq(left, right);
 			}
-			case "!=": {
+			case BinaryOp.NotEq: {
 				// todo handle errors for non impl
 				return left.getImpl(EqTrait).eq(left, right).not();
 			}
-			case "&&":
+			case BinaryOp.And: {
 				return new BooleanValue(left.asBoolean() && right.asBoolean());
-			case "||":
+			}
+			case BinaryOp.Or: {
 				return new BooleanValue(left.asBoolean() || right.asBoolean());
+			}
 			default:
 				throw new Error(`Invalid Operator ${expr.operator}`);
 		}
