@@ -47,6 +47,11 @@ export type PropertyAccessor<T extends Value = Value> = {
 	getProperty(me: T, prop: string): Value;
 };
 
+export type PropertyAccessorMap<Self extends Value = Value> = Record<
+	string,
+	(me: Self) => Value
+>;
+
 export const AddTrait = defineTrait<Add>("_core_AddTrait");
 export const SubTrait = defineTrait<Sub>("_core_SubTrait");
 export const MulTrait = defineTrait<Mul>("_core_MulTrait");

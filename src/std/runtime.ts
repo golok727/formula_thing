@@ -96,7 +96,7 @@ export class FormulaRuntime extends Environment {
 		_,
 		args
 	) => {
-		return new StringValue(args.args.map((arg) => arg.asString()).join(""));
+		return new StringValue(args.raw.map((arg) => arg.asString()).join(""));
 	};
 
 	private static _if: FunctionDefinition<FormulaRuntime>["fn"] = (_, args) => {

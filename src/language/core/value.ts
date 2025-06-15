@@ -1,6 +1,7 @@
 import {
 	addImpl as addImpl,
 	getImpl,
+	type PropertyAccessorMap,
 	type Trait,
 	type ValueConstructor,
 } from "./index.js";
@@ -23,7 +24,10 @@ export abstract class BaseValue implements Value {
 	abstract asString(): string;
 	abstract asBoolean(): boolean;
 	abstract asNumber(): number;
-	abstract isNone(): boolean;
+
+	isNone(): boolean {
+		return false;
+	}
 
 	getImpl<T>(trait: Trait<T>): Readonly<T>;
 	getImpl<T>(trait: Trait<T>, optional: true): Readonly<T> | null;
@@ -57,4 +61,6 @@ export abstract class BaseValue implements Value {
 	static is(val: unknown): val is BaseValue {
 		return val instanceof BaseValue;
 	}
+
+	static readonly props: PropertyAccessorMap<any> = {};
 }

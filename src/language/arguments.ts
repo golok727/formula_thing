@@ -1,13 +1,13 @@
 import { None, type Value } from "./core/index.js";
 
 export class Arguments {
-	constructor(public readonly args: Value[]) {}
+	constructor(public readonly raw: Value[]) {}
 
 	get length(): number {
-		return this.args.length;
+		return this.raw.length;
 	}
 
 	get(index: number): Value {
-		return this.args[index] ?? None;
+		return this.raw[index] ?? None;
 	}
 }

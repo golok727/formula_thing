@@ -1,7 +1,13 @@
+import type { PropertyAccessorMap } from "../../op.js";
 import { BaseValue } from "../../value.js";
+import { Fn } from "../fn/fn.js";
 
 export class BooleanValue extends BaseValue {
 	readonly typeHint: string = "Boolean";
+
+	readonly then = new Fn((args) => {
+		return this.value ? args.get(0) : args.get(1);
+	});
 
 	constructor(public readonly value: boolean) {
 		super();
@@ -19,10 +25,6 @@ export class BooleanValue extends BaseValue {
 		return this.value ? 1 : 0;
 	}
 
-	isNone(): boolean {
-		return false;
-	}
-
 	not(): BooleanValue {
 		return new BooleanValue(!this.value);
 	}
@@ -30,4 +32,8 @@ export class BooleanValue extends BaseValue {
 	static is(val: unknown): val is BooleanValue {
 		return val instanceof BooleanValue;
 	}
+
+	static readonly props: PropertyAccessorMap<BooleanValue> = {
+		then: (me: BooleanValue) => me.then,
+	};
 }

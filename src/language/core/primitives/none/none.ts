@@ -19,7 +19,7 @@ export class NoneValue extends BaseValue {
 		return 0;
 	}
 
-	isNone(): boolean {
+	override isNone(): boolean {
 		return true;
 	}
 

@@ -7,6 +7,7 @@ import {
 	None,
 	NumberValue,
 	StringValue,
+	type PropertyAccessorMap,
 	type Value,
 } from "./language/index.js";
 import { FormulaRuntime } from "./std/runtime.js";
@@ -39,13 +40,15 @@ export class Thing extends BaseValue {
 	isNone(): boolean {
 		return false;
 	}
+
+	static override readonly props: PropertyAccessorMap<Thing> = {
+		next: (me) => me.next,
+		value: (me) => new NumberValue(me.value),
+		magic: (me) => me.magic,
+	};
 }
 
-implPropertyAccessor(Thing, {
-	next: (me) => me.next,
-	value: (me) => new NumberValue(me.value),
-	magic: (me) => me.magic,
-});
+implPropertyAccessor(Thing);
 
 const runtime = new FormulaRuntime();
 runtime.define({

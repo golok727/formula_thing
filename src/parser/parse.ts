@@ -1,4 +1,5 @@
 import {
+	ArrayExpr,
 	BinaryExpr,
 	binaryOpFromTokenKind,
 	CallExpr,
@@ -26,10 +27,6 @@ export class Parser {
 		this.t1 = this.tokens.next() ?? null;
 	}
 
-	private _isEof(): boolean {
-		return this.t0 === null;
-	}
-
 	private _nextToken(): Token | null {
 		const cur = this.t0;
 		const next = this.tokens.next();
@@ -51,6 +48,16 @@ export class Parser {
 				this.t0?.kind ?? TokenKind.Eof
 			}'`
 		);
+	}
+
+	private _parseArrayExpr(): ArrayExpr {
+		this._expectOne(TokenKind.LBracket); // consume '['
+		const elements = this._parseSeriesOf(
+			() => this._parseExpr(),
+			TokenKind.Comma
+		);
+		this._expectOne(TokenKind.RBracket); // consume ']'
+		return new ArrayExpr(elements, span(0, 0));
 	}
 
 	private _parseParenthesized<T>(parse: () => T): T {
@@ -175,6 +182,9 @@ export class Parser {
 						}
 						return expr;
 					});
+				}
+				case TokenKind.LBracket: {
+					return this._parseArrayExpr();
 				}
 				case TokenKind.Not: {
 					const not = this._nextToken()!; // consume 'not'

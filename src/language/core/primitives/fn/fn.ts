@@ -16,10 +16,6 @@ export class Fn extends BaseValue {
 		return NaN;
 	}
 
-	isNone(): boolean {
-		return false;
-	}
-
 	constructor(
 		public readonly fn: (args: Arguments) => Value,
 		public readonly name = "anonymous"
@@ -29,5 +25,9 @@ export class Fn extends BaseValue {
 
 	call(args: Value[]): Value {
 		return this.fn(new Arguments(args)) ?? None;
+	}
+
+	static override is(val: unknown): val is Fn {
+		return val instanceof Fn;
 	}
 }

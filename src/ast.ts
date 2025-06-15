@@ -23,6 +23,15 @@ export class EmptyExpr extends Expr {
 	}
 }
 
+export class ArrayExpr extends Expr {
+	constructor(public readonly elements: Expr[], span: SrcSpan) {
+		super(span);
+	}
+
+	visit<Result>(visitor: Visitor<Result>): Result {
+		return visitor.visitArrayExpr(this);
+	}
+}
 export class LiteralExpr extends Expr {
 	constructor(public readonly value: string | number | boolean, span: SrcSpan) {
 		super(span);

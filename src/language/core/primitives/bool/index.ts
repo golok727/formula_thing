@@ -11,4 +11,4 @@ BooleanValue.addImpl<Eq<BooleanValue>>(EqTrait, BoolValueImpl)
 	.addImpl(OrdTrait, NumberValueImpl);
 
 implCoreArithmetic(BooleanValue);
-implPropertyAccessor(BooleanValue, {});
+implPropertyAccessor(BooleanValue);

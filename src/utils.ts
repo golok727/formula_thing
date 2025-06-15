@@ -1,5 +1,6 @@
 import type { Visitor } from "./visitor.js";
 import {
+	ArrayExpr,
 	BinaryExpr,
 	CallExpr,
 	UnaryExpr,
@@ -18,6 +19,10 @@ export class Printer implements Visitor<string> {
 	}
 	visitIdent(expr: Ident): string {
 		return expr.name;
+	}
+	visitArrayExpr(expr: ArrayExpr): string {
+		const elements = expr.elements.map((el) => el.visit(this)).join(", ");
+		return `[${elements}]`;
 	}
 	visitBinaryExpr(expr: BinaryExpr): string {
 		return `${expr.left.visit(this)} ${expr.operator} ${expr.right.visit(

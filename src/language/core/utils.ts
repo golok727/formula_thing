@@ -13,18 +13,10 @@ import { CoreArithmeticImpl, None } from "./primitives/index.js";
 import { addImpl, type ValueConstructor } from "./trait.js";
 import type { Value } from "./value.js";
 
-export type PropertyAccessorMap<Self extends Value = Value> = Record<
-	string,
-	(me: Self) => Value
->;
-
-export function implPropertyAccessor<C extends ValueConstructor>(
-	cstr: C,
-	prototype: PropertyAccessorMap<InstanceType<C>>
-) {
+export function implPropertyAccessor<C extends ValueConstructor>(cstr: C) {
 	addImpl(cstr, PropertyAccessorTrait, {
 		getProperty(me: Value, prop: string): Value {
-			const get = prototype[prop];
+			const get = cstr.props[prop];
 			if (get) {
 				return get(me as InstanceType<C>);
 			}

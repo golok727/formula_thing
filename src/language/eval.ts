@@ -6,6 +6,7 @@ import {
 	CallTrait,
 	DivTrait,
 	EqTrait,
+	List,
 	MulTrait,
 	NegTrait,
 	None,
@@ -18,6 +19,7 @@ import {
 	SubTrait,
 } from "./core/index.js";
 import {
+	ArrayExpr,
 	Ident,
 	MemberExpr,
 	type BinaryExpr,
@@ -54,6 +56,11 @@ export class Evaluator implements Visitor<Value> {
 			throw new Error(`Identifier '${ident.name}' is not defined.`);
 		}
 		return val;
+	}
+
+	visitArrayExpr(expr: ArrayExpr): Value {
+		const items = expr.elements.map((el) => el.visit(this));
+		return new List(items);
 	}
 
 	visitBinaryExpr(expr: BinaryExpr): Value {
