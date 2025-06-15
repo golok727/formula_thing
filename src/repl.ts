@@ -1,12 +1,60 @@
 import { Formula } from "./language/formula.js";
-import { Environment, StringValue, type Value } from "./language/index.js";
+import {
+	BaseValue,
+	Environment,
+	Fn,
+	implPropertyAccessor,
+	None,
+	NumberValue,
+	StringValue,
+	type Value,
+} from "./language/index.js";
 import { FormulaRuntime } from "./std/runtime.js";
 
 import readline from "node:readline/promises";
 
 let running = true;
 
+export class Thing extends BaseValue {
+	typeHint: string = "Thing";
+
+	constructor(public value = 69, public next: Value = None) {
+		super();
+	}
+
+	readonly magic = new Fn(
+		() => new StringValue(`Magic! ${this.value}`),
+		"magic"
+	);
+
+	asString(): string {
+		return "This is a Thing";
+	}
+	asBoolean(): boolean {
+		return true;
+	}
+	asNumber(): number {
+		return this.value;
+	}
+	isNone(): boolean {
+		return false;
+	}
+}
+
+implPropertyAccessor(Thing, {
+	next: (me) => me.next,
+	value: (me) => new NumberValue(me.value),
+	magic: (me) => me.magic,
+});
+
 const runtime = new FormulaRuntime();
+runtime.define({
+	type: "value",
+	linkName: "thing",
+	description: "A sample Thing object",
+	getValue: new Thing(69, new Thing(420, new Thing(666))),
+});
+
 runtime.define({
 	type: "function",
 	linkname: "let",
