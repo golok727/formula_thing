@@ -55,7 +55,7 @@ export class FormulaRuntime extends Environment {
 			type: "value",
 			linkName: "None",
 			description: "Represents a None value, similar to null or undefined.",
-			getValue: () => None,
+			value: () => None,
 		});
 	}
 

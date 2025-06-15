@@ -52,7 +52,7 @@ runtime.define({
 	type: "value",
 	linkName: "thing",
 	description: "A sample Thing object",
-	getValue: new Thing(69, new Thing(420, new Thing(666))),
+	value: new Thing(69, new Thing(420, new Thing(666))),
 });
 
 runtime.define({
@@ -66,7 +66,7 @@ runtime.define({
 			type: "value",
 			linkName: defName,
 			override: true,
-			getValue: value,
+			value: value,
 		});
 
 		return value;

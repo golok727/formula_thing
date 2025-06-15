@@ -11,7 +11,7 @@ export type ValueDefinition<Env extends Environment = Environment> = {
 	linkName: string;
 	description?: string;
 	override?: boolean;
-	getValue: Value | ((env: Env) => Value);
+	value: Value | ((env: Env) => Value);
 };
 
 export type FunctionDefinition<Env extends Environment = Environment> = {

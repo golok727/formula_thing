@@ -19,10 +19,10 @@ export class Environment {
 	get(name: string): Value | null {
 		const variable = this._values.get(name);
 		if (variable) {
-			if (typeof variable.getValue === "function") {
-				return variable.getValue(this);
+			if (typeof variable.value === "function") {
+				return variable.value(this);
 			} else {
-				return variable.getValue;
+				return variable.value;
 			}
 		} else {
 			return this._parent?.get(name) ?? null;
@@ -36,7 +36,7 @@ export class Environment {
 				linkName: def.linkname,
 				description: def.description,
 				override: false,
-				getValue: new Fn((args) => def.fn(this, args) ?? None, def.linkname),
+				value: new Fn((args) => def.fn(this, args) ?? None, def.linkname),
 			});
 		} else if (def.type === "value") {
 			if (!def.override && this._values.has(def.linkName)) {
