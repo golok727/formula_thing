@@ -12,6 +12,7 @@ import {
 	NotTrait,
 	NumberValue,
 	OrdTrait,
+	PropertyAccessorTrait,
 	RemTrait,
 	StringValue,
 	SubTrait,
@@ -25,6 +26,7 @@ import {
 	type UnaryExpr,
 } from "../ast.js";
 import type { Visitor } from "../visitor.js";
+import { StringValueImpl } from "./core/primitives/string/impl.js";
 
 export class Evaluator implements Visitor<Value> {
 	constructor(public env: Environment) {}
@@ -60,7 +62,7 @@ export class Evaluator implements Visitor<Value> {
 		switch (expr.operator) {
 			case "+": {
 				if (left instanceof StringValue || right instanceof StringValue) {
-					return StringValue.add(left, right);
+					return StringValueImpl.add(left, right);
 				}
 				return left.getImpl(AddTrait).add(left, right);
 			}
@@ -128,6 +130,9 @@ export class Evaluator implements Visitor<Value> {
 	}
 
 	visitMemberExpr(expr: MemberExpr): Value {
-		throw new Error("Method not implemented.");
+		const referer = expr.referer.visit(this);
+		const access = referer.getImpl(PropertyAccessorTrait);
+		const property = access.getProperty(referer, expr.property.name);
+		return property;
 	}
 }

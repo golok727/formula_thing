@@ -1,17 +1,12 @@
 import {
-	AddTrait,
-	DivTrait,
 	EqTrait,
-	MulTrait,
-	NegTrait,
 	NotTrait,
+	PropertyAccessorTrait,
 	OrdTrait,
-	RemTrait,
-	SubTrait,
 	type Eq,
 } from "../../op.js";
+import { implCoreArithmetic } from "../../utils.js";
 import { BoolValueImpl } from "../bool/impl.js";
-import { CoreArithmeticImpl } from "../common.js";
 import { NumberValueImpl } from "../number/impl.js";
 import { NoneValueImpl } from "./impl.js";
 import { NoneValue } from "./none.js";
@@ -19,14 +14,15 @@ import { NoneValue } from "./none.js";
 export * from "./none.js";
 export * from "./impl.js";
 
+implCoreArithmetic(NoneValue);
+
 NoneValue.addImpl<Eq<NoneValue>>(EqTrait, NoneValueImpl)
 	.addImpl(NotTrait, BoolValueImpl)
-	.addImpl(AddTrait, CoreArithmeticImpl)
-	.addImpl(SubTrait, CoreArithmeticImpl)
-	.addImpl(MulTrait, CoreArithmeticImpl)
-	.addImpl(DivTrait, CoreArithmeticImpl)
-	.addImpl(RemTrait, CoreArithmeticImpl)
 	.addImpl(OrdTrait, NumberValueImpl)
-	.addImpl(NegTrait, BoolValueImpl);
+	.addImpl(PropertyAccessorTrait, {
+		getProperty(_, prop: string): NoneValue {
+			throw new Error(`Cannot access property '${prop}' on None value.`);
+		},
+	});
 
 export const None = new NoneValue();

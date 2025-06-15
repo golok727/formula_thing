@@ -1,9 +1,16 @@
 import { BaseValue, type Value } from "../../value.js";
+import { Fn } from "../fn/fn.js";
 
 export class StringValue extends BaseValue {
 	readonly typeHint: string = "String";
 
-	constructor(public value: string) {
+	get length(): number {
+		return this.value.length;
+	}
+
+	readonly trim = new Fn(() => new StringValue(this.value.trim()));
+
+	constructor(public readonly value: string) {
 		super();
 	}
 
@@ -21,10 +28,6 @@ export class StringValue extends BaseValue {
 
 	isNone(): boolean {
 		return false;
-	}
-
-	static add(me: Value, other: Value): StringValue {
-		return new StringValue(me.asString() + other.asString());
 	}
 
 	static is(val: unknown): val is StringValue {

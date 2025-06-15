@@ -1,6 +1,7 @@
 import type { Environment } from "../environment.js";
 import type { BooleanValue } from "./primitives/bool/bool.js";
 import { defineTrait } from "./trait.js";
+
 import type { Value } from "./value.js";
 
 export const Ordering = {
@@ -41,6 +42,10 @@ export type Not<T extends Value = Value> = {
 export type Call<T extends Value = Value> = {
 	call(me: T, callEnv: Environment, args: Value[]): Value;
 };
+// for a.b,  a.b.c,  a.b.c() etc..
+export type PropertyAccessor<T extends Value = Value> = {
+	getProperty(me: T, prop: string): Value;
+};
 
 export const AddTrait = defineTrait<Add>("_core_AddTrait");
 export const SubTrait = defineTrait<Sub>("_core_SubTrait");
@@ -52,3 +57,6 @@ export const EqTrait = defineTrait<Eq>("_core_EqTrait");
 export const NegTrait = defineTrait<Neg>("_core_NegTrait");
 export const NotTrait = defineTrait<Not>("_core_NotTrait");
 export const CallTrait = defineTrait<Call>("_core_CallTrait");
+export const PropertyAccessorTrait = defineTrait<PropertyAccessor>(
+	"_core_PropertyAccessorTrait"
+);

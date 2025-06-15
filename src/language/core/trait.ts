@@ -43,7 +43,7 @@ export function getImpl<T>(
 	return (impl ?? null) as Readonly<T> | null;
 }
 
-export function addTrait<T>(
+export function addImpl<T>(
 	ctor: ValueConstructor,
 	trait: Trait<T>,
 	impl: T,

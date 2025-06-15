@@ -3,7 +3,7 @@ import { BaseValue } from "../../value.js";
 export class BooleanValue extends BaseValue {
 	readonly typeHint: string = "Boolean";
 
-	constructor(public value: boolean) {
+	constructor(public readonly value: boolean) {
 		super();
 	}
 

@@ -4,10 +4,10 @@ import type { Value } from "./core/value.js";
 
 export type EnvDefineConfig<Env extends Environment = Environment> =
 	| FunctionDefinition<Env>
-	| VariableDefinition<Env>;
+	| ValueDefinition<Env>;
 
-export type VariableDefinition<Env extends Environment = Environment> = {
-	type: "variable";
+export type ValueDefinition<Env extends Environment = Environment> = {
+	type: "value";
 	linkName: string;
 	description?: string;
 	override?: boolean;

@@ -6,12 +6,9 @@ import {
 } from "../common.js";
 import { BooleanValue } from "./bool.js";
 
-export type BoolImplementations = CoreArithmeticImplementations &
-	Not &
-	Eq<BooleanValue>;
+export type BoolImplementations = Not & Eq<BooleanValue>;
 
 export const BoolValueImpl: BoolImplementations = {
-	...CoreArithmeticImpl,
 	not(me: Value): BooleanValue {
 		return new BooleanValue(!me.asBoolean());
 	},

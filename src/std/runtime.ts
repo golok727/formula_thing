@@ -23,7 +23,7 @@ export class FormulaRuntime extends Environment {
 			fn: FormulaRuntime._concat,
 		});
 		this.define({
-			type: "variable",
+			type: "value",
 			linkName: "None",
 			description: "Represents a None value, similar to null or undefined.",
 			getValue: () => None,

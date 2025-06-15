@@ -3,7 +3,7 @@ import { BaseValue } from "../../value.js";
 export class NumberValue extends BaseValue {
 	readonly typeHint: string = "Number";
 
-	constructor(public value: number) {
+	constructor(public readonly value: number) {
 		super();
 	}
 

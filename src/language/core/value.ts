@@ -1,5 +1,5 @@
 import {
-	addTrait as addImpl,
+	addImpl as addImpl,
 	getImpl,
 	type Trait,
 	type ValueConstructor,

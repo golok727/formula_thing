@@ -3,6 +3,7 @@ import type { Value } from "../value.js";
 import { NumberValue } from "./number/number.js";
 
 export type CoreArithmeticImplementations = Add & Sub & Mul & Div & Rem & Neg;
+
 export const CoreArithmeticImpl: CoreArithmeticImplementations = {
 	add(me: Value, other: Value): Value {
 		return new NumberValue(me.asNumber() + other.asNumber());
