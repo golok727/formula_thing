@@ -7,6 +7,10 @@ export class Arguments {
 		return this.raw.length;
 	}
 
+	getOr(index: number, defaultValue: () => Value): Value {
+		return this.raw[index] ?? defaultValue();
+	}
+
 	get(index: number): Value {
 		return this.raw[index] ?? None;
 	}

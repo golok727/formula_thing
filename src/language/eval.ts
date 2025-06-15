@@ -1,11 +1,12 @@
 import type { Value } from "./core/value.js";
-import type { Environment } from "./environment.js";
+import { Environment } from "./environment.js";
 import {
 	AddTrait,
 	BooleanValue,
 	CallTrait,
 	DivTrait,
 	EqTrait,
+	Fn,
 	List,
 	MulTrait,
 	NegTrait,
@@ -22,7 +23,9 @@ import {
 	ArrayExpr,
 	BinaryExpr,
 	BinaryOp,
+	ConditionalExpr,
 	Ident,
+	LambdaExpr,
 	MemberExpr,
 	type CallExpr,
 	type LiteralExpr,
@@ -33,6 +36,24 @@ import { StringValueImpl } from "./core/primitives/string/impl.js";
 
 export class Evaluator implements Visitor<Value> {
 	constructor(public env: Environment) {}
+
+	visitConditionalExpr(expr: ConditionalExpr): Value {
+		const condition = expr.condition.visit(this);
+		return condition.asBoolean()
+			? expr.consequent.visit(this)
+			: expr.alternate.visit(this);
+	}
+
+	visitLambdaExpr(expr: LambdaExpr): Value {
+		return new Fn((args) => {
+			const localEnv = new Environment(this.env);
+			expr.params.forEach((param, ix) =>
+				localEnv.set(param.name, args.get(ix))
+			);
+			const evaluator = new Evaluator(localEnv);
+			return expr.body.visit(evaluator);
+		});
+	}
 
 	visitEmptyExpr(): Value {
 		return None;

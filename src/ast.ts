@@ -1,7 +1,7 @@
 import { Printer } from "./utils.js";
 import type { SrcSpan } from "./span.js";
 import type { Visit, Visitor } from "./visitor.js";
-import { Token, TokenKind } from "./parser/token.js";
+import { TokenKind } from "./parser/token.js";
 
 export abstract class Expr implements Visit {
 	constructor(public readonly span: SrcSpan) {}
@@ -78,6 +78,34 @@ export class UnaryExpr extends Expr {
 
 	visit<Result>(visitor: Visitor<Result>): Result {
 		return visitor.visitUnaryExpr(this);
+	}
+}
+
+export class ConditionalExpr extends Expr {
+	constructor(
+		public readonly condition: Expr,
+		public readonly consequent: Expr,
+		public readonly alternate: Expr,
+		span: SrcSpan
+	) {
+		super(span);
+	}
+	visit<Result>(visitor: Visitor<Result>): Result {
+		return visitor.visitConditionalExpr(this);
+	}
+}
+
+export class LambdaExpr extends Expr {
+	constructor(
+		public readonly params: Ident[],
+		public readonly body: Expr,
+		span: SrcSpan
+	) {
+		super(span);
+	}
+
+	visit<Result>(visitor: Visitor<Result>): Result {
+		return visitor.visitLambdaExpr(this);
 	}
 }
 

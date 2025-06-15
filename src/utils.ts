@@ -3,18 +3,40 @@ import {
 	ArrayExpr,
 	BinaryExpr,
 	CallExpr,
+	ConditionalExpr,
+	LambdaExpr,
 	UnaryExpr,
 	type Expr,
 	type Ident,
 	type LiteralExpr,
 	type MemberExpr,
 } from "./ast.js";
+import { FormulaRuntime } from "./std/runtime.js";
+import { Formula } from "./language/formula.js";
+import type { Environment } from "./language/environment.js";
+import type { Value } from "./language/index.js";
 
 export class Printer implements Visitor<string> {
 	visitEmptyExpr(): string {
 		return "";
 	}
+
+	visitConditionalExpr(expr: ConditionalExpr): string {
+		return `${expr.condition.visit(this)} ? ${expr.consequent.visit(
+			this
+		)} : ${expr.alternate.visit(this)}`;
+	}
+
+	visitLambdaExpr(expr: LambdaExpr): string {
+		const params = expr.params.map((p) => p.visit(this)).join(", ");
+		const body = expr.body.visit(this);
+		return `|${params}| ${body}`;
+	}
+
 	visitLiteralExpr(expr: LiteralExpr): string {
+		if (typeof expr.value === "string") {
+			return `"${expr.value}"`;
+		}
 		return JSON.stringify(expr.value);
 	}
 	visitIdent(expr: Ident): string {
@@ -41,33 +63,11 @@ export class Printer implements Visitor<string> {
 	}
 }
 
-export class LruCache<K, V> {
-	private cache: Map<K, V>;
-	private maxSize: number;
-
-	constructor(maxSize: number) {
-		this.cache = new Map();
-		this.maxSize = maxSize;
-	}
-
-	get(key: K): V | undefined {
-		const value = this.cache.get(key);
-		if (value !== undefined) {
-			this.cache.delete(key);
-			this.cache.set(key, value); // Move to the end
-		}
-		return value;
-	}
-
-	set(key: K, value: V): void {
-		if (this.cache.has(key)) {
-			this.cache.delete(key);
-		} else if (this.cache.size >= this.maxSize) {
-			const firstKey = this.cache.keys().next().value;
-			if (firstKey) {
-				this.cache.delete(firstKey);
-			}
-		}
-		this.cache.set(key, value);
-	}
+export function evaluateFormula(
+	source: string,
+	env: Environment = new FormulaRuntime()
+): Value {
+	const formula = new Formula(source, "Eval").compile();
+	const instance = env.createInstance(formula);
+	return instance.eval();
 }

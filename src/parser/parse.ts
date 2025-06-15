@@ -3,9 +3,11 @@ import {
 	BinaryExpr,
 	binaryOpFromTokenKind,
 	CallExpr,
+	ConditionalExpr,
 	EmptyExpr,
 	getOpPrecedence,
 	Ident,
+	LambdaExpr,
 	LiteralExpr,
 	MemberExpr,
 	UnaryExpr,
@@ -39,46 +41,6 @@ export class Parser {
 		return this.t0?.kind === kind;
 	}
 
-	private _expectOne(kind: TokenKind): Token {
-		if (this.t0?.kind === kind) {
-			return this._nextToken()!;
-		}
-		throw new Error(
-			`Expected token of kind '${kind}', but found '${
-				this.t0?.kind ?? TokenKind.Eof
-			}'`
-		);
-	}
-
-	private _parseArrayExpr(): ArrayExpr {
-		this._expectOne(TokenKind.LBracket); // consume '['
-		const elements = this._parseSeriesOf(
-			() => this._parseExpr(),
-			TokenKind.Comma
-		);
-		this._expectOne(TokenKind.RBracket); // consume ']'
-		return new ArrayExpr(elements, span(0, 0));
-	}
-
-	private _parseParenthesized<T>(parse: () => T): T {
-		this._expectOne(TokenKind.LParen); // consume '('
-		const expr = parse();
-		this._expectOne(TokenKind.RParen); // consume ')'
-		return expr;
-	}
-
-	private _parseFnCall(callee: Expr): Expr {
-		const args = this._parseParenthesized(() => {
-			let argsList = this._parseSeriesOf(() => {
-				return this._parseExpr();
-			}, TokenKind.Comma);
-			return argsList;
-		});
-
-		const fn = new CallExpr(callee, args, span(0, 0));
-		return this._tryParsePostFixExpr(fn);
-	}
-
 	private _parseSeriesOf<T>(
 		parse: () => T | null,
 		delim: TokenKind | null
@@ -105,6 +67,73 @@ export class Parser {
 		return items;
 	}
 
+	private _expectOne(kind: TokenKind): Token {
+		if (this.t0?.kind === kind) {
+			return this._nextToken()!;
+		}
+		throw new Error(
+			`Expected token of kind '${kind}', but found '${
+				this.t0?.kind ?? TokenKind.Eof
+			}'`
+		);
+	}
+
+	private _parseParenthesized<T>(parse: () => T): T {
+		this._expectOne(TokenKind.LParen); // consume '('
+		const expr = parse();
+		this._expectOne(TokenKind.RParen); // consume ')'
+		return expr;
+	}
+
+	private _parseArrayExpr(): ArrayExpr {
+		this._expectOne(TokenKind.LBracket); // consume '['
+		const elements = this._parseSeriesOf(
+			() => this._parseExpr(),
+			TokenKind.Comma
+		);
+		this._expectOne(TokenKind.RBracket); // consume ']'
+		return new ArrayExpr(elements, span(0, 0));
+	}
+
+	// |((param),)*| expr
+	private _parseLambdaExpr() {
+		const mayBeEmptyParams = this._nextIs(TokenKind.Or);
+		let params: Ident[] = [];
+
+		if (!mayBeEmptyParams) {
+			this._expectOne(TokenKind.Pipe); // consume '|'
+			params = this._parseSeriesOf(() => this._parseIdent(), TokenKind.Comma);
+			this._expectOne(TokenKind.Pipe); // consume '|'
+		} else {
+			this._expectOne(TokenKind.Or); // consume '||'
+		}
+
+		const body = this._parseExpr();
+		if (!body) {
+			throw new Error("Invalid lambda expression: expected body after '|'");
+		}
+
+		return new LambdaExpr(params, body, span(0, 0)); // todo span
+	}
+
+	/**
+	  expr((args: expr)*,)
+	 */
+	private _parseFnCall(callee: Expr): Expr {
+		const args = this._parseParenthesized(() => {
+			let argsList = this._parseSeriesOf(() => {
+				return this._parseExpr();
+			}, TokenKind.Comma);
+			return argsList;
+		});
+
+		const fn = new CallExpr(callee, args, span(0, 0));
+		return this._tryParsePostFixExpr(fn);
+	}
+	/**
+	 	expr.ident
+		expr.ident.ident
+	 */
 	private _parseMemberExpr(referer: Expr): Expr {
 		this._expectOne(TokenKind.Dot); // consume '.'
 		if (!this._nextIs(TokenKind.Ident)) {
@@ -133,12 +162,48 @@ export class Parser {
 		return new Ident(name, token.span);
 	}
 
+	/*
+			expr ? (consequent: expr) : (alternate: expr)
+		*/
+	private _parseTernaryExpr(condition: Expr): Expr {
+		this._expectOne(TokenKind.Question); // consume '?'
+		const consequent = this._parseExpr();
+		if (!consequent) {
+			throw new Error("Expected an expression after '?'");
+		}
+		this._expectOne(TokenKind.Colon); // consume ':'
+		const alternate = this._parseExpr();
+		if (!alternate) {
+			throw new Error("Expected an expression after ':'");
+		}
+
+		return new ConditionalExpr(
+			condition,
+			consequent,
+			alternate,
+			span(0, 0) // todo span
+		);
+	}
+
+	/*
+		expr.member
+		(expr)()
+		expr[index]
+		expr ? consequent : alternate
+	*/
 	private _tryParsePostFixExpr(prefix: Expr): Expr {
 		if (this._nextIs(TokenKind.LParen)) {
 			return this._parseFnCall(prefix);
 		} else if (this._nextIs(TokenKind.Dot)) {
 			return this._parseMemberExpr(prefix);
+		} else if (this._nextIs(TokenKind.Question)) {
+			return this._parseTernaryExpr(prefix);
+		} else if (this._nextIs(TokenKind.LBracket)) {
+			throw new Error(
+				"Index access is not implemented yet. Use 'expr[index]' syntax."
+			);
 		}
+
 		// todo index access
 		return prefix;
 	}
@@ -182,6 +247,11 @@ export class Parser {
 						}
 						return expr;
 					});
+				}
+				// lambda expr
+				case TokenKind.Pipe:
+				case TokenKind.Or: {
+					return this._parseLambdaExpr();
 				}
 				case TokenKind.LBracket: {
 					return this._parseArrayExpr();

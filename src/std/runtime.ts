@@ -2,6 +2,7 @@ import { Environment } from "../language/environment.js";
 import type { FunctionDefinition } from "../language/types.js";
 import {
 	BooleanValue,
+	List,
 	None,
 	NumberValue,
 	StringValue,
@@ -52,12 +53,46 @@ export class FormulaRuntime extends Environment {
 		});
 
 		this.define({
+			type: "function",
+			linkname: "range",
+			description:
+				"Generates a list of numbers. \n\nUsage: `range([start,] end)` where `start` is optional and defaults to 0.",
+			fn: FormulaRuntime._range,
+		});
+
+		this.define({
 			type: "value",
 			linkName: "None",
 			description: "Represents a None value, similar to null or undefined.",
 			value: () => None,
 		});
 	}
+
+	private static _range: FunctionDefinition<FormulaRuntime>["fn"] = (
+		_,
+		args
+	) => {
+		if (args.length === 0) {
+			return new List([]);
+		}
+		if (args.length === 1) {
+			const end = args.get(0).asNumber();
+			return new List(
+				Array.from({ length: end }, (_, i) => new NumberValue(i))
+			);
+		}
+		if (args.length === 2) {
+			const start = args.get(0).asNumber();
+			const end = args.get(1).asNumber();
+			return new List(
+				Array.from(
+					{ length: end - start },
+					(_, i) => new NumberValue(i + start)
+				)
+			);
+		}
+		throw new Error("range() function requires either 0, 1, or 2 arguments.");
+	};
 
 	private static _bool: FunctionDefinition<FormulaRuntime>["fn"] = (
 		_,

@@ -6,7 +6,6 @@ export const TokenKind = {
 	Number: "number",
 	String: "string",
 	Ident: "ident",
-	Keyword: "keyword",
 	Plus: "+",
 	Minus: "-",
 	Star: "*",
@@ -31,6 +30,7 @@ export const TokenKind = {
 	Question: "?",
 	And: "&&",
 	Or: "||",
+	Pipe: "|",
 } as const;
 
 export type TokenKind = (typeof TokenKind)[keyof typeof TokenKind];

@@ -286,7 +286,7 @@ export class Lexer implements Iterable<Token> {
 					this.chars.next(); // consume the next '|'
 					return TokenKind.Or;
 				}
-				return TokenKind.Unknown; // single '|' is not supported
+				return TokenKind.Pipe;
 			}
 			case "<": {
 				const next = this.chars.peek();

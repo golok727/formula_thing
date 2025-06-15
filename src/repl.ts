@@ -13,6 +13,7 @@ import {
 import { FormulaRuntime } from "./std/runtime.js";
 
 import readline from "node:readline/promises";
+import { evaluateFormula } from "./utils.js";
 
 let running = true;
 
@@ -113,12 +114,3 @@ while (running) {
 }
 
 rl.close();
-
-export function evaluateFormula(
-	source: string,
-	env: Environment = new FormulaRuntime()
-): Value {
-	const formula = new Formula(source, "Eval").compile();
-	const instance = env.createInstance(formula);
-	return instance.eval();
-}

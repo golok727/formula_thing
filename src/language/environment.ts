@@ -16,6 +16,14 @@ export class Environment {
 		this._parent = parent;
 	}
 
+	set(name: string, value: Value) {
+		this.define({
+			type: "value",
+			linkName: name,
+			value,
+		});
+	}
+
 	get(name: string): Value | null {
 		const variable = this._values.get(name);
 		if (variable) {
