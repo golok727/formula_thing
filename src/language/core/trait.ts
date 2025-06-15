@@ -21,16 +21,26 @@ const traitMap: Map<ValueConstructor, Map<string, any>> = new Map();
 export function getImpl<T>(
 	ctor: ValueConstructor,
 	trait: Trait<T>
-): Readonly<T> {
-	if (!traitMap.has(ctor)) {
-		throw new Error(`No traits defined for ${ctor.name}.`);
-	}
-	const implMap = traitMap.get(ctor)!;
+): Readonly<T>;
+export function getImpl<T>(
+	ctor: ValueConstructor,
+	trait: Trait<T>,
+	optional: true
+): Readonly<T> | null;
+export function getImpl<T>(
+	ctor: ValueConstructor,
+	trait: Trait<T>,
+	optional?: boolean
+): Readonly<T> | null {
+	const implMap = traitMap.get(ctor);
 
-	if (!implMap.has(trait.id)) {
-		throw new Error(`Trait ${trait.id} is not implemented for ${ctor.name}.`);
+	const impl = implMap?.get(trait.id);
+
+	if (!impl && !optional) {
+		throw new Error(`Trait ${trait.id} is not defined for ${ctor.name}.`);
 	}
-	return implMap.get(trait.id) as T;
+
+	return (impl ?? null) as Readonly<T> | null;
 }
 
 export function addTrait<T>(

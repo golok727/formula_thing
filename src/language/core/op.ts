@@ -1,6 +1,5 @@
-import type { Arguments } from "../arguments.js";
 import type { Environment } from "../environment.js";
-import type { BooleanValue } from "./primitives/bool.js";
+import type { BooleanValue } from "./primitives/bool/bool.js";
 import { defineTrait } from "./trait.js";
 import type { Value } from "./value.js";
 

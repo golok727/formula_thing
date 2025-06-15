@@ -8,9 +8,6 @@ export class Arguments {
 	}
 
 	get(index: number): Value {
-		if (index < 0 || index >= this.args.length) {
-			return None;
-		}
-		return this.args[index] || None;
+		return this.args[index] ?? None;
 	}
 }

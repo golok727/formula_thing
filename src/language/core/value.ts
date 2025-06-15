@@ -14,6 +14,7 @@ export interface Value {
 	isNone(): boolean;
 
 	getImpl<T>(trait: Trait<T>): Readonly<T>;
+	getImpl<T>(trait: Trait<T>, optional: true): Readonly<T> | null;
 }
 
 export abstract class BaseValue implements Value {
@@ -24,12 +25,24 @@ export abstract class BaseValue implements Value {
 	abstract asNumber(): number;
 	abstract isNone(): boolean;
 
-	getImpl<T>(trait: Trait<T>): T {
-		return getImpl<T>(this.constructor as ValueConstructor, trait);
+	getImpl<T>(trait: Trait<T>): Readonly<T>;
+	getImpl<T>(trait: Trait<T>, optional: true): Readonly<T> | null;
+	getImpl<T>(trait: Trait<T>, optional?: true): Readonly<T> | null {
+		return getImpl<T>(
+			this.constructor as ValueConstructor,
+			trait,
+			optional as true
+		);
 	}
 
-	static getImpl<T>(trait: Trait<T>): T {
-		return getImpl<T>(this as unknown as ValueConstructor, trait);
+	static getImpl<T>(trait: Trait<T>): Readonly<T>;
+	static getImpl<T>(trait: Trait<T>, optional: true): Readonly<T> | null;
+	static getImpl<T>(trait: Trait<T>, optional?: true): Readonly<T> | null {
+		return getImpl<T>(
+			this as unknown as ValueConstructor,
+			trait,
+			optional as true
+		);
 	}
 
 	static addImpl<T>(trait: Trait<T>, impl: T, replace?: boolean) {
