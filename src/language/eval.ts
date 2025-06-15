@@ -122,10 +122,25 @@ export class Evaluator implements Visitor<Value> {
 	visitCallExpr(expr: CallExpr): Value {
 		const callee = expr.callee.visit(this);
 		const args = expr.args.map((arg) => arg.visit(this));
+
+		const fn = callee.getImpl(CallTrait, true);
+
+		if (!fn) {
+			throw new Error(
+				`'${expr.callee.toString()}' (type: ${
+					callee.typeHint
+				}) is not a function`
+			);
+		}
+
 		try {
-			return callee.getImpl(CallTrait).call(callee, this.env, args);
-		} catch {
-			throw new Error(`${callee.typeHint} is not callable`);
+			return fn.call(callee, this.env, args);
+		} catch (error) {
+			throw new Error(
+				`Error while calling function '${expr.callee.toString()}': ${
+					error instanceof Error ? error.message : String(error)
+				}`
+			);
 		}
 	}
 
