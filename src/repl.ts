@@ -41,7 +41,7 @@ export class Thing extends BaseValue {
 		return false;
 	}
 
-	static override readonly props: PropertyAccessorMap<Thing> = {
+	static override readonly properties: PropertyAccessorMap<Thing> = {
 		next: (me) => me.next,
 		value: (me) => new NumberValue(me.value),
 		magic: (me) => me.magic,

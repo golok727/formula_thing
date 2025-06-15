@@ -1,6 +1,6 @@
 import type { Arguments } from "../../../arguments.js";
 import type { PropertyAccessorMap } from "../../op.js";
-import { BaseValue, type Value } from "../../value.js";
+import { BaseValue } from "../../value.js";
 import { Fn } from "../fn/fn.js";
 import { NumberValue } from "../number/number.js";
 
@@ -55,7 +55,7 @@ export class StringValue extends BaseValue {
 		return val instanceof StringValue;
 	}
 
-	static override readonly props: PropertyAccessorMap<StringValue> = {
+	static override readonly properties: PropertyAccessorMap<StringValue> = {
 		len: (me: StringValue) => new NumberValue(me.value.length),
 		trim: (me: StringValue) => me.trim,
 		upper: (me: StringValue) => me.upper,

@@ -1,5 +1,4 @@
 import { BaseValue, type Value } from "../../value.js";
-import { BooleanValue } from "../bool/bool.js";
 
 export class NoneValue extends BaseValue {
 	readonly typeHint: string = "None";

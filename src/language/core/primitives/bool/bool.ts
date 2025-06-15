@@ -33,7 +33,7 @@ export class BooleanValue extends BaseValue {
 		return val instanceof BooleanValue;
 	}
 
-	static readonly props: PropertyAccessorMap<BooleanValue> = {
+	static override readonly properties: PropertyAccessorMap<BooleanValue> = {
 		then: (me: BooleanValue) => me.then,
 	};
 }

@@ -1,3 +1,4 @@
+import type { PropertyAccessorMap } from "../../op.js";
 import { BaseValue } from "../../value.js";
 
 export class NumberValue extends BaseValue {
@@ -26,4 +27,8 @@ export class NumberValue extends BaseValue {
 	static is(val: unknown): val is NumberValue {
 		return val instanceof NumberValue;
 	}
+
+	static override readonly properties: PropertyAccessorMap<NumberValue> = {
+		floor: (me: NumberValue) => new NumberValue(Math.floor(me.value)),
+	};
 }

@@ -1,9 +1,5 @@
 import type { Eq, Not } from "../../op.js";
 import type { Value } from "../../value.js";
-import {
-	CoreArithmeticImpl,
-	type CoreArithmeticImplementations,
-} from "../common.js";
 import { BooleanValue } from "./bool.js";
 
 export type BoolImplementations = Not & Eq<BooleanValue>;

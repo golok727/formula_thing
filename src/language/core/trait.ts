@@ -17,7 +17,7 @@ export function defineTrait<T>(id: string): Trait<T> {
 
 export interface ValueConstructor {
 	new (...args: any[]): Value;
-	readonly props: PropertyAccessorMap<any>;
+	readonly properties: PropertyAccessorMap<any>;
 }
 
 const traitMap: Map<ValueConstructor, Map<string, any>> = new Map();

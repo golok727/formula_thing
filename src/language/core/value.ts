@@ -1,5 +1,6 @@
 import {
 	addImpl as addImpl,
+	Fn,
 	getImpl,
 	type PropertyAccessorMap,
 	type Trait,
@@ -62,5 +63,5 @@ export abstract class BaseValue implements Value {
 		return val instanceof BaseValue;
 	}
 
-	static readonly props: PropertyAccessorMap<any> = {};
+	static readonly properties: PropertyAccessorMap<any> = {};
 }
