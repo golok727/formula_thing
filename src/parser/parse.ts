@@ -8,6 +8,7 @@ import {
 	LiteralExpr,
 	MemberExpr,
 	UnaryExpr,
+	UnaryOp,
 	type Expr,
 } from "../ast.js";
 import { span } from "../span.js";
@@ -187,7 +188,7 @@ export class Parser {
 							`Expected an expression after '${not.source(this.source)}'.`
 						);
 					}
-					return new UnaryExpr("!", expr, not.span);
+					return new UnaryExpr(UnaryOp.Not, expr, not.span);
 				}
 				case TokenKind.Minus: {
 					const minus = this._nextToken()!; // consume '-'
@@ -197,7 +198,7 @@ export class Parser {
 							`Expected an expression after '${minus.source(this.source)}'.`
 						);
 					}
-					return new UnaryExpr("-", expr, minus.span);
+					return new UnaryExpr(UnaryOp.Negate, expr, minus.span);
 				}
 				default:
 					return null;
