@@ -74,13 +74,6 @@ class RowEnvironment extends Environment {
 	};
 }
 
-/*
- Todo  Known limitations:
- - support (10).thing().thing()
- - support "String".methods()
- - support thing()() ?
-*/
-
 const src = `
 if(
 	prop("Age") >= 18, 
