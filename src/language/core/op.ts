@@ -40,7 +40,7 @@ export type Not<T extends Value = Value> = {
 	not(me: T): BooleanValue;
 };
 export type Call<T extends Value = Value> = {
-	call(me: T, callEnv: Environment, args: Value[]): Value;
+	call(me: T, args: Value[]): Value;
 };
 // for a.b,  a.b.c,  a.b.c() etc..
 export type PropertyAccessor<T extends Value = Value> = {

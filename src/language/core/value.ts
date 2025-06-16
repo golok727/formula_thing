@@ -1,6 +1,5 @@
 import {
-	addImpl as addImpl,
-	Fn,
+	addImpl,
 	getImpl,
 	type PropertyAccessorMap,
 	type Trait,

@@ -1,8 +1,6 @@
-import type { Arguments } from "../../../arguments.js";
-import type { PropertyAccessorMap } from "../../op.js";
+import { type PropertyAccessorMap } from "../../op.js";
 import { BaseValue, type Value } from "../../value.js";
 import { Fn } from "../fn/index.js";
-import { None } from "../index.js";
 import { NumberValue } from "../number/number.js";
 import { StringValue } from "../string/string.js";
 
@@ -16,6 +14,7 @@ export class List extends BaseValue {
 	map = new Fn((args) => {
 		const mapFn = args.get(0);
 
+		// todo use trait
 		if (!Fn.is(mapFn)) {
 			throw new Error("First argument to List.map must be a function");
 		}
@@ -27,8 +26,10 @@ export class List extends BaseValue {
 
 	filter = new Fn((args) => {
 		const filterFn = args.get(0);
+
+		// todo use trait
 		if (!Fn.is(filterFn)) {
-			throw new Error("First argument to List.filter must be a function");
+			throw new Error("First argument to List.filter must be a callable");
 		}
 		return new List(
 			this.items.filter((item, i) =>
@@ -40,8 +41,10 @@ export class List extends BaseValue {
 	fold = new Fn((args) => {
 		const foldFn = args.get(0);
 		const initial = args.get(1);
+
+		// todo use trait
 		if (!Fn.is(foldFn)) {
-			throw new Error("First argument to List.fold must be a function");
+			throw new Error("First argument to List.fold must be a callable");
 		}
 		return this.items.reduce(
 			(acc, item, i) => foldFn.call([acc, item, new NumberValue(i)]),
@@ -51,6 +54,7 @@ export class List extends BaseValue {
 
 	join = new Fn((args) => {
 		const separator = args.get(0);
+
 		return new StringValue(
 			this.items.join(separator.isNone() ? "" : separator.asString())
 		);

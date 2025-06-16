@@ -16,12 +16,14 @@ export class Environment {
 		this._parent = parent;
 	}
 
-	set(name: string, value: Value) {
+	set(name: string, value: Value, override: boolean = false): this {
 		this.define({
 			type: "value",
 			linkName: name,
 			value,
+			override: override,
 		});
+		return this;
 	}
 
 	get(name: string): Value | null {

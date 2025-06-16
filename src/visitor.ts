@@ -1,17 +1,21 @@
 import type {
 	ArrayExpr,
+	AssignmentExpr,
 	BinaryExpr,
 	CallExpr,
 	ConditionalExpr,
 	EmptyExpr,
 	Ident,
 	LambdaExpr,
+	LetExpr,
 	LiteralExpr,
 	MemberExpr,
 	UnaryExpr,
 } from "./ast.js";
 
 export interface Visitor<Result = unknown> {
+	visitAssignExpr(expr: AssignmentExpr): Result;
+	visitLetExpr(expr: LetExpr): Result;
 	visitConditionalExpr(expr: ConditionalExpr): Result;
 	visitArrayExpr(expr: ArrayExpr): Result;
 	visitEmptyExpr(expr: EmptyExpr): Result;

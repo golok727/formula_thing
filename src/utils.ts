@@ -1,10 +1,12 @@
 import type { Visitor } from "./visitor.js";
 import {
 	ArrayExpr,
+	AssignmentExpr,
 	BinaryExpr,
 	CallExpr,
 	ConditionalExpr,
 	LambdaExpr,
+	LetExpr,
 	UnaryExpr,
 	type Expr,
 	type Ident,
@@ -17,6 +19,19 @@ import type { Environment } from "./language/environment.js";
 import type { Value } from "./language/index.js";
 
 export class Printer implements Visitor<string> {
+	visitAssignExpr(expr: AssignmentExpr): string {
+		return `${expr.target.visit(this)} = ${expr.value.visit(this)}`;
+	}
+
+	visitLetExpr(expr: LetExpr): string {
+		const bindings = expr.bindings.map((b) => b.visit(this)).join(", ");
+		let body = "";
+		if (expr.body) {
+			body = `,${expr.body.visit(this)}`;
+		}
+		return `let(${bindings}${body})`;
+	}
+
 	visitEmptyExpr(): string {
 		return "";
 	}

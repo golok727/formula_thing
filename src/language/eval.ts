@@ -1,5 +1,18 @@
-import type { Value } from "./core/value.js";
-import { Environment } from "./environment.js";
+import {
+	ArrayExpr,
+	AssignmentExpr,
+	BinaryExpr,
+	BinaryOp,
+	ConditionalExpr,
+	Ident,
+	LambdaExpr,
+	LetExpr,
+	MemberExpr,
+	type CallExpr,
+	type LiteralExpr,
+	type UnaryExpr,
+} from "../ast.js";
+import type { Visitor } from "../visitor.js";
 import {
 	AddTrait,
 	BooleanValue,
@@ -19,23 +32,55 @@ import {
 	StringValue,
 	SubTrait,
 } from "./core/index.js";
-import {
-	ArrayExpr,
-	BinaryExpr,
-	BinaryOp,
-	ConditionalExpr,
-	Ident,
-	LambdaExpr,
-	MemberExpr,
-	type CallExpr,
-	type LiteralExpr,
-	type UnaryExpr,
-} from "../ast.js";
-import type { Visitor } from "../visitor.js";
 import { StringValueImpl } from "./core/primitives/string/impl.js";
+import type { Value } from "./core/value.js";
+import { Environment } from "./environment.js";
 
+type StackFrame = {
+	value: Value;
+};
+
+const MAX_CALL_STACK_DEPTH = 1000;
 export class Evaluator implements Visitor<Value> {
-	constructor(public env: Environment) {}
+	private _evaluationScope: Environment;
+	private _callStack: StackFrame[] = [];
+
+	constructor(public rootEnv: Environment) {
+		this._evaluationScope = rootEnv;
+	}
+
+	private get _scope() {
+		return this._evaluationScope;
+	}
+
+	private _capture(): Evaluator {
+		const localEnv = new Environment(this._evaluationScope);
+		const evaluator = new Evaluator(this.rootEnv);
+		evaluator._evaluationScope = localEnv;
+		evaluator._callStack = this._callStack;
+		return evaluator;
+	}
+
+	visitAssignExpr(_: AssignmentExpr): Value {
+		throw new Error("Should not reach here");
+	}
+
+	visitLetExpr(expr: LetExpr): Value {
+		const local = this._capture();
+		const env = local._scope;
+
+		expr.bindings.map((binding) => {
+			const value = binding.value.visit(local);
+			env.set(binding.target.name, value);
+			return value;
+		});
+
+		if (expr.body) {
+			return expr.body.visit(local);
+		}
+
+		return None;
+	}
 
 	visitConditionalExpr(expr: ConditionalExpr): Value {
 		const condition = expr.condition.visit(this);
@@ -45,13 +90,16 @@ export class Evaluator implements Visitor<Value> {
 	}
 
 	visitLambdaExpr(expr: LambdaExpr): Value {
+		// capture the current scope upon creation of the lambda
+		const capture = this._capture();
 		return new Fn((args) => {
-			const localEnv = new Environment(this.env);
+			// local variables for this lambda
+			const local = capture._capture();
+			const env = local._scope;
 			expr.params.forEach((param, ix) =>
-				localEnv.set(param.name, args.get(ix))
+				env.set(param.name, args.get(ix), true)
 			);
-			const evaluator = new Evaluator(localEnv);
-			return expr.body.visit(evaluator);
+			return expr.body.visit(local);
 		});
 	}
 
@@ -73,7 +121,7 @@ export class Evaluator implements Visitor<Value> {
 	}
 
 	visitIdent(ident: Ident): Value {
-		const val = this.env.get(ident.name);
+		const val = this._scope.get(ident.name);
 		if (!val) {
 			throw new Error(`Identifier '${ident.name}' is not defined.`);
 		}
@@ -150,13 +198,27 @@ export class Evaluator implements Visitor<Value> {
 		}
 	}
 
+	private _pushFrame(value: Value): void {
+		if (this._callStack.length >= MAX_CALL_STACK_DEPTH) {
+			throw new Error(`Maximum call stack depth exceeded`);
+		}
+		this._callStack.push({ value });
+	}
+
+	private _popFrame(): void {
+		if (this._callStack.length === 0) {
+			throw new Error(`Call stack is empty, something went wrong`);
+		}
+		this._callStack.pop();
+	}
+
 	visitCallExpr(expr: CallExpr): Value {
 		const callee = expr.callee.visit(this);
 		const args = expr.args.map((arg) => arg.visit(this));
 
-		const fn = callee.getImpl(CallTrait, true);
+		const callable = callee.getImpl(CallTrait, true);
 
-		if (!fn) {
+		if (!callable) {
 			throw new Error(
 				`'${expr.callee.toString()}' (type: ${
 					callee.typeHint
@@ -164,14 +226,11 @@ export class Evaluator implements Visitor<Value> {
 			);
 		}
 
+		this._pushFrame(callee);
 		try {
-			return fn.call(callee, this.env, args);
-		} catch (error) {
-			throw new Error(
-				`Error while calling function '${expr.callee.toString()}': ${
-					error instanceof Error ? error.message : String(error)
-				}`
-			);
+			return callable.call(callee, args);
+		} finally {
+			this._popFrame();
 		}
 	}
 

@@ -91,7 +91,7 @@ export class AssignmentExpr extends Expr {
 	}
 
 	visit<Result>(visitor: Visitor<Result>): Result {
-		throw new Error("Todo: Implement AssignmentExpr visitor");
+		return visitor.visitAssignExpr(this);
 	}
 }
 
@@ -105,7 +105,7 @@ export class LetExpr extends Expr {
 	}
 
 	visit<Result>(visitor: Visitor<Result>): Result {
-		throw new Error("Todo: Implement LetExpr visitor");
+		return visitor.visitLetExpr(this);
 	}
 }
 

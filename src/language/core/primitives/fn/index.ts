@@ -6,7 +6,7 @@ import { Fn } from "./fn.js";
 export * from "./fn.js";
 
 Fn.addImpl(CallTrait, {
-	call(me: Value, _: Environment, args: Value[]) {
+	call(me: Value, args: Value[]) {
 		if (!(me instanceof Fn)) {
 			throw new Error(
 				`First parameter to Fn.call must be a Fn but got ${me.typeHint}`

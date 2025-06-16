@@ -61,23 +61,6 @@ runtime.define({
 
 runtime.define({
 	type: "function",
-	linkname: "let",
-	fn: (env, args) => {
-		const defName = args.get(0).asString();
-		const value = args.get(1);
-
-		env.define({
-			type: "value",
-			linkName: defName,
-			override: true,
-			value: value,
-		});
-
-		return value;
-	},
-});
-runtime.define({
-	type: "function",
 	description: "Get the current time",
 	linkname: "now",
 	fn: () => {

@@ -96,21 +96,6 @@ rt.define({
 		return new StringValue(new Date().toDateString());
 	},
 });
-rt.define({
-	type: "function",
-	linkname: "let",
-	fn: (env, args) => {
-		const defName = args.get(0).asString();
-		const value = args.get(1);
-		env.define({
-			type: "value",
-			linkName: defName,
-			override: true,
-			value: value,
-		});
-		return value;
-	},
-});
 
 // for each database create a new environment
 let sourceEnv = new DataViewFormulaEnvironment(source1);
@@ -156,19 +141,9 @@ console.log(evaluateFormula(fizzBuzz1, new Environment(rt)).asString());
 	const env = new Environment(rt);
 
 	{
-		const n = 10;
-		const fibDefine = `
-		let("fib", |n| (n <= 1) ? n : fib(n - 1) + fib(n - 2) )
-	`;
-		let fibFn = evaluateFormula(fibDefine, env);
-		let res = fibFn.getImpl(CallTrait).call(fibFn, env, [new NumberValue(n)]);
-		console.log(`Fib(${n}) = ${res.asNumber()}`);
-	}
-
-	{
-		const read = `
-			range(0, 10 + 1).map(fib)
+		const src = `
+			let(fib = |n| (n <= 2) ? n : fib(n - 1) + fib(n - 2),	range(0, 20).map(fib))
 		`;
-		console.log(evaluateFormula(read, env).asString());
+		console.log(evaluateFormula(src, env).asString());
 	}
 }
