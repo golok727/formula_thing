@@ -67,17 +67,6 @@ export class Parser {
 		return items;
 	}
 
-	private _expectOneOf(...kinds: TokenKind[]): Token {
-		if (this.t0 && kinds.includes(this.t0.kind)) {
-			return this._nextToken()!;
-		}
-		throw new Error(
-			`Expected one of tokens ${kinds.join(", ")}, but found '${
-				this.t0?.kind ?? TokenKind.Eof
-			}'`
-		);
-	}
-
 	private _expectOne(kind: TokenKind): Token {
 		if (this.t0?.kind === kind) {
 			return this._nextToken()!;
@@ -203,7 +192,7 @@ export class Parser {
 			if (!condition) {
 				throw new Error("Expected a condition expression after 'if'");
 			}
-			let sep = this._expectOneOf(TokenKind.Then, TokenKind.Comma);
+			let sep = this._expectOne(TokenKind.Comma);
 			const consequent = this._parseExpr();
 
 			if (!consequent) {
@@ -212,7 +201,7 @@ export class Parser {
 				);
 			}
 
-			sep = this._expectOneOf(TokenKind.Else, TokenKind.Comma);
+			sep = this._expectOne(TokenKind.Comma);
 			const alternate = this._parseExpr();
 			if (!alternate) {
 				throw new Error(
