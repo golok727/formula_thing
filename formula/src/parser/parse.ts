@@ -273,8 +273,6 @@ export class Parser {
 			return this._parseFnCall(prefix);
 		} else if (this._nextIs(TokenKind.Dot)) {
 			return this._parseMemberExpr(prefix);
-		} else if (this._nextIs(TokenKind.Question)) {
-			return this._parseTernaryExpr(prefix);
 		} else if (this._nextIs(TokenKind.LBracket)) {
 			throw new Error("Index access is not implemented yet.");
 		}
@@ -410,6 +408,9 @@ export class Parser {
 		}
 
 		const expr = handleOp(null, opStack, exprStack, opExprReducer);
+		if (expr && this._nextIs(TokenKind.Question)) {
+			return this._parseTernaryExpr(expr);
+		}
 		return expr;
 	}
 

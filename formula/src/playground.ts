@@ -113,16 +113,17 @@ console.log(row2.eval().asString());
 
 const fizzBuzz = `
 range(1, 100).map(|n| 
-		(n % 3 == 0 and n % 5 == 0) ? "Fizzbuzz" : 
-		(n % 3 == 0) ? "Fizz": 
-		(n % 5 == 0) ? "Buzz" : n
+		n % 3 == 0 and n % 5 == 0 ? "Fizzbuzz" : 
+		n % 3 == 0 ? "Fizz": 
+		n % 5 == 0 ? "Buzz" : n
 	)
 `;
 const fizzBuzz1 = `
 range(1, 100).map(|n|
 	if(
 		n % 3 == 0 and n % 5 == 0, "Fizzbuzz",
-		if( n % 3 == 0, "Fizz", 
+		if ( 
+				n % 3 == 0, "Fizz", 
 				if(n % 5 == 0, "Buzz", n)
 			)
 	)
@@ -142,7 +143,10 @@ console.log(evaluateFormula(fizzBuzz1, new Environment(rt)).asString());
 
 	{
 		const src = `
-			let(fib = |n| (n <= 2) ? n : fib(n - 1) + fib(n - 2),	range(0, 20).map(fib))
+			let(
+				fib = |n| n <= 2 ? n : fib(n - 1) + fib(n - 2),	
+				range(0, 20).map(fib)
+			)
 		`;
 		console.log(evaluateFormula(src, env).asString());
 	}
