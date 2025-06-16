@@ -1,17 +1,18 @@
 {
-	"name": "formula_repo",
+	"name": "formula",
 	"module": "index.ts",
 	"type": "module",
-	"workspaces": [
-		"./formula",
-		"./playground"
-	],
 	"private": true,
 	"devDependencies": {
 		"@types/bun": "latest"
 	},
+	"exports": {
+		".": {
+			"import": "./src/index.ts"
+		}
+	},
 	"scripts": {
-		"repl": "bun --filter formula repl"
+		"repl": "bun run ./src/repl.ts"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
