@@ -124,6 +124,7 @@ class FormulaEditor extends Mountable {
 		// Create the editor
 		this.editor = monaco.editor.create(this.editorContainer, {
 			value: this._initialCode,
+			snippetSuggestions: "top",
 			language: "formula",
 			theme: "ayu-dark",
 			minimap: { enabled: false },
@@ -133,6 +134,8 @@ class FormulaEditor extends Mountable {
 			scrollBeyondLastLine: false,
 			roundedSelection: true,
 			padding: { top: 0, bottom: 0 },
+			quickSuggestions: true,
+			suggestOnTriggerCharacters: true,
 		});
 
 		// Set up the change event listener for auto-run
@@ -272,6 +275,7 @@ class FormulaEditor extends Mountable {
 
 		// Add intellisense/auto-completion
 		monaco.languages.registerCompletionItemProvider("formula", {
+			triggerCharacters: [" "],
 			provideCompletionItems: (model, position) => {
 				// Get word being typed
 				const word = model.getWordUntilPosition(position);

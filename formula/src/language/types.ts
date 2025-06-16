@@ -8,7 +8,7 @@ export type EnvDefineConfig<Env extends Environment = Environment> =
 
 export type ValueDefinition<Env extends Environment = Environment> = {
 	type: "value";
-	linkName: string;
+	linkname: string;
 	description?: string;
 	override?: boolean;
 	value: Value | ((env: Env) => Value);

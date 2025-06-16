@@ -54,7 +54,7 @@ implPropertyAccessor(Thing);
 const runtime = new FormulaRuntime();
 runtime.define({
 	type: "value",
-	linkName: "thing",
+	linkname: "thing",
 	description: "A sample Thing object",
 	value: new Thing(69, new Thing(420, new Thing(666))),
 });

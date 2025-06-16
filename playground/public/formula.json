@@ -11,6 +11,7 @@
 			"patterns": [
 				{ "include": "#literal" },
 				{ "include": "#operators" },
+				{ "include": "#keywords" },
 				{ "include": "#entity" }
 			]
 		},
@@ -115,7 +116,7 @@
 					"name": "keyword.operator.assignment.formula"
 				},
 				{
-					"match": "and|or|not",
+					"match": "\\b(and|or|not)\\b|&&|(?<!\\|)\\|\\|(?!\\|)|!",
 					"name": "keyword.operator.logical.formula"
 				},
 				{
@@ -164,6 +165,15 @@
 			]
 		},
 
+		"keywords": {
+			"patterns": [
+				{
+					"match": "\\b(if|let)\\b",
+					"name": "keyword.control.formula"
+				}
+			]
+		},
+
 		"literal": {
 			"patterns": [
 				{
@@ -198,15 +208,7 @@
 					"name": "punctuation.definition.string.begin.formula"
 				}
 			},
-			"end": "(\")|((?:[^\\\\\\n])$)",
-			"endCaptures": {
-				"1": {
-					"name": "punctuation.definition.string.end.formula"
-				},
-				"2": {
-					"name": "invalid.illegal.newline.formula"
-				}
-			},
+			"end": "\"",
 			"name": "string.quoted.double.formula",
 			"patterns": [
 				{
@@ -222,15 +224,7 @@
 					"name": "punctuation.definition.string.begin.formula"
 				}
 			},
-			"end": "(\\')|((?:[^\\\\\\n])$)",
-			"endCaptures": {
-				"1": {
-					"name": "punctuation.definition.string.end.formula"
-				},
-				"2": {
-					"name": "invalid.illegal.newline.formula"
-				}
-			},
+			"end": "'",
 			"name": "string.quoted.single.formula",
 			"patterns": [
 				{

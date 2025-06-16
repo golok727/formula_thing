@@ -19,7 +19,7 @@ export class Environment {
 	set(name: string, value: Value, override: boolean = false): this {
 		this.define({
 			type: "value",
-			linkName: name,
+			linkname: name,
 			value,
 			override: override,
 		});
@@ -43,16 +43,16 @@ export class Environment {
 		if (def.type === "function") {
 			this.define({
 				type: "value",
-				linkName: def.linkname,
+				linkname: def.linkname,
 				description: def.description,
 				override: false,
 				value: new Fn((args) => def.fn(this, args) ?? None, def.linkname),
 			});
 		} else if (def.type === "value") {
-			if (!def.override && this._values.has(def.linkName)) {
-				throw new Error(`Name '${def.linkName}' is already defined.`);
+			if (!def.override && this._values.has(def.linkname)) {
+				throw new Error(`Name '${def.linkname}' is already defined.`);
 			}
-			this._values.set(def.linkName, def as ValueDefinition);
+			this._values.set(def.linkname, def as ValueDefinition);
 		}
 
 		return this;
