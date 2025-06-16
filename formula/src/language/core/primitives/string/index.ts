@@ -1,6 +1,7 @@
 import { AddTrait, EqTrait, NotTrait, OrdTrait, type Eq } from "../../op.js";
-import { implCoreArithmetic, implPropertyAccessor } from "../../utils.js";
+import { implPropertyAccessor } from "../../utils.js";
 import { BoolValueImpl } from "../bool/impl.js";
+import { implCoreArithmetic } from "../common.js";
 import { StringValueImpl } from "./impl.js";
 import { StringValue } from "./string.js";
 

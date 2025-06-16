@@ -14,6 +14,7 @@
 	},
 	"dependencies": {
 		"shiki": "^3.6.0",
-    "formula": "workspace:*"
+		"monaco-editor": "^0.52.2",
+		"formula": "workspace:*"
 	}
 }

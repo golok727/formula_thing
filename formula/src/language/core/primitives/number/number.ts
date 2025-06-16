@@ -1,5 +1,6 @@
 import type { PropertyAccessorMap } from "../../op.js";
 import { BaseValue } from "../../value.js";
+import { Fn } from "../fn/fn.js";
 
 export class NumberValue extends BaseValue {
 	readonly typeHint: string = "Number";
@@ -7,6 +8,8 @@ export class NumberValue extends BaseValue {
 	constructor(public readonly value: number) {
 		super();
 	}
+
+	floor = new Fn(() => new NumberValue(Math.floor(this.value)));
 
 	asString(): string {
 		return this.value.toString();
@@ -29,6 +32,6 @@ export class NumberValue extends BaseValue {
 	}
 
 	static override readonly properties: PropertyAccessorMap<NumberValue> = {
-		floor: (me: NumberValue) => new NumberValue(Math.floor(me.value)),
+		floor: (me: NumberValue) => me.floor,
 	};
 }

@@ -1,3 +1,4 @@
+import { implCoreArithmetic } from "../common.js";
 import {
 	EqTrait,
 	NotTrait,
@@ -5,14 +6,13 @@ import {
 	OrdTrait,
 	type Eq,
 } from "../../op.js";
-import { implCoreArithmetic } from "../../utils.js";
 import { BoolValueImpl } from "../bool/impl.js";
 import { NumberValueImpl } from "../number/impl.js";
 import { NoneValueImpl } from "./impl.js";
 import { NoneValue } from "./none.js";
 
-export * from "./none.js";
 export * from "./impl.js";
+export * from "./none.js";
 
 implCoreArithmetic(NoneValue);
 

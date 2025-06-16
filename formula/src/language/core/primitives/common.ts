@@ -1,4 +1,18 @@
-import type { Add, Div, Mul, Neg, Rem, Sub } from "../op.js";
+import {
+	AddTrait,
+	DivTrait,
+	MulTrait,
+	NegTrait,
+	RemTrait,
+	SubTrait,
+	type Add,
+	type Div,
+	type Mul,
+	type Neg,
+	type Rem,
+	type Sub,
+} from "../op.js";
+import { addImpl, type ValueConstructor } from "../trait.js";
 import type { Value } from "../value.js";
 import { NumberValue } from "./number/number.js";
 
@@ -29,3 +43,12 @@ export const CoreArithmeticImpl: CoreArithmeticImplementations = {
 		return new NumberValue(-me.asNumber());
 	},
 };
+
+export function implCoreArithmetic<C extends ValueConstructor>(cstr: C) {
+	addImpl(cstr, AddTrait, CoreArithmeticImpl);
+	addImpl(cstr, SubTrait, CoreArithmeticImpl);
+	addImpl(cstr, MulTrait, CoreArithmeticImpl);
+	addImpl(cstr, DivTrait, CoreArithmeticImpl);
+	addImpl(cstr, RemTrait, CoreArithmeticImpl);
+	addImpl(cstr, NegTrait, CoreArithmeticImpl);
+}
