@@ -1,5 +1,6 @@
 import {
 	ArrayExpr,
+	AssignmentExpr,
 	BinaryExpr,
 	binaryOpFromTokenKind,
 	CallExpr,
@@ -8,6 +9,7 @@ import {
 	getOpPrecedence,
 	Ident,
 	LambdaExpr,
+	LetExpr,
 	LiteralExpr,
 	MemberExpr,
 	UnaryExpr,
@@ -185,6 +187,53 @@ export class Parser {
 		);
 	}
 
+	/*
+		ident = expr
+		ident = expr, ident = expr
+	*/
+	private _tryParseAssignment(): AssignmentExpr | null {
+		if (this._nextIs(TokenKind.Ident) && this.t1?.kind === TokenKind.Eq) {
+			const ident = this._expectOne(TokenKind.Ident);
+			this._expectOne(TokenKind.Eq); // consume '='
+			const expr = this._parseExpr();
+			if (!expr) {
+				throw new Error(
+					`Expected an expression after '=' in assignment to '${ident.source(
+						this.source
+					)}'`
+				);
+			}
+			return new AssignmentExpr(
+				new Ident(ident.source(this.source), ident.span),
+				expr,
+				span(0, 0) // todo span
+			);
+		}
+
+		return null;
+	}
+	/*
+		let ( ((ident = expr)+), (body: expr)? )
+	 */
+	private _parseLetExpr(): Expr {
+		this._expectOne(TokenKind.Let); // consume 'let'
+
+		return this._parseParenthesized(() => {
+			const bindings = this._parseSeriesOf(() => {
+				return this._tryParseAssignment();
+			}, TokenKind.Comma);
+
+			if (bindings.length === 0) {
+				throw new Error(`Expected at least one binding in 'let' expression`);
+			}
+
+			let body: Expr | null = this._parseExpr();
+			return new LetExpr(bindings, body, span(0, 0));
+		});
+	}
+	/*
+		if (condition:expr, consequent: expr, alternate: expr)
+	 */
 	private _parseIfExpr(): Expr {
 		this._expectOne(TokenKind.If); // consume 'if'
 		return this._parseParenthesized(() => {
@@ -227,9 +276,7 @@ export class Parser {
 		} else if (this._nextIs(TokenKind.Question)) {
 			return this._parseTernaryExpr(prefix);
 		} else if (this._nextIs(TokenKind.LBracket)) {
-			throw new Error(
-				"Index access is not implemented yet. Use 'expr[index]' syntax."
-			);
+			throw new Error("Index access is not implemented yet.");
 		}
 
 		// todo index access
@@ -260,6 +307,9 @@ export class Parser {
 				}
 				case TokenKind.If: {
 					return this._parseIfExpr();
+				}
+				case TokenKind.Let: {
+					return this._parseLetExpr();
 				}
 				case TokenKind.Ident: {
 					const ident = this._parseIdent();

@@ -310,7 +310,7 @@ export class Lexer implements Iterable<Token> {
 					this.chars.next(); // consume the next '='
 					return TokenKind.EqEq;
 				}
-				throw new Error(`Unexpected character ${c} at position ${start}`);
+				return TokenKind.Eq;
 			}
 			case "!": {
 				const next = this.chars.peek();

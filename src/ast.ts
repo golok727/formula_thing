@@ -81,6 +81,34 @@ export class UnaryExpr extends Expr {
 	}
 }
 
+export class AssignmentExpr extends Expr {
+	constructor(
+		public readonly target: Ident,
+		public readonly value: Expr,
+		span: SrcSpan
+	) {
+		super(span);
+	}
+
+	visit<Result>(visitor: Visitor<Result>): Result {
+		throw new Error("Todo: Implement AssignmentExpr visitor");
+	}
+}
+
+export class LetExpr extends Expr {
+	constructor(
+		public readonly bindings: AssignmentExpr[],
+		public readonly body: Expr | null,
+		span: SrcSpan
+	) {
+		super(span);
+	}
+
+	visit<Result>(visitor: Visitor<Result>): Result {
+		throw new Error("Todo: Implement LetExpr visitor");
+	}
+}
+
 export class ConditionalExpr extends Expr {
 	constructor(
 		public readonly condition: Expr,
