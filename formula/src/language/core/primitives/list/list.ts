@@ -11,6 +11,14 @@ export class List extends BaseValue {
 		super();
 	}
 
+	concat = new Fn((args) => {
+		const otherList = args.get(0);
+		if (!List.is(otherList)) {
+			throw new Error("First argument to List.concat must be a List");
+		}
+		return new List([...this.items, ...otherList.items]);
+	}, "concat");
+
 	map = new Fn((args) => {
 		const mapFn = args.get(0);
 
@@ -78,6 +86,7 @@ export class List extends BaseValue {
 		map: (me) => me.map,
 		filter: (me) => me.filter,
 		fold: (me) => me.fold,
+		concat: (me) => me.concat,
 	};
 
 	static override is(val: unknown): val is List {
