@@ -2,6 +2,9 @@ import type { SrcSpan } from "../span.js";
 
 export const TokenKind = {
 	Eof: "eof",
+	If: "if",
+	Then: "then",
+	Else: "else",
 	Boolean: "boolean",
 	Number: "number",
 	String: "string",
@@ -43,6 +46,12 @@ export function tryGetKeywordFromString(kind: string): TokenKind | null {
 			return TokenKind.And;
 		case "not":
 			return TokenKind.Not;
+		case "if":
+			return TokenKind.If;
+		case "then":
+			return TokenKind.Then;
+		case "else":
+			return TokenKind.Else;
 		case "true":
 		case "false":
 			return TokenKind.Boolean;

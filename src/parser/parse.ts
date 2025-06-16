@@ -67,6 +67,17 @@ export class Parser {
 		return items;
 	}
 
+	private _expectOneOf(...kinds: TokenKind[]): Token {
+		if (this.t0 && kinds.includes(this.t0.kind)) {
+			return this._nextToken()!;
+		}
+		throw new Error(
+			`Expected one of tokens ${kinds.join(", ")}, but found '${
+				this.t0?.kind ?? TokenKind.Eof
+			}'`
+		);
+	}
+
 	private _expectOne(kind: TokenKind): Token {
 		if (this.t0?.kind === kind) {
 			return this._nextToken()!;
@@ -185,6 +196,34 @@ export class Parser {
 		);
 	}
 
+	private _parseIfExpr(): Expr {
+		this._expectOne(TokenKind.If); // consume 'if'
+		return this._parseParenthesized(() => {
+			const condition = this._parseExpr();
+			if (!condition) {
+				throw new Error("Expected a condition expression after 'if'");
+			}
+			let sep = this._expectOneOf(TokenKind.Then, TokenKind.Comma);
+			const consequent = this._parseExpr();
+
+			if (!consequent) {
+				throw new Error(
+					`Expected a consequent expression after '${sep.source(this.source)}'`
+				);
+			}
+
+			sep = this._expectOneOf(TokenKind.Else, TokenKind.Comma);
+			const alternate = this._parseExpr();
+			if (!alternate) {
+				throw new Error(
+					`Expected an alternate expression after '${sep.source(this.source)}'`
+				);
+			}
+
+			return new ConditionalExpr(condition, consequent, alternate, span(0, 0));
+		});
+	}
+
 	/*
 		expr.member
 		(expr)()
@@ -229,6 +268,9 @@ export class Parser {
 						token.source(this.source).slice(1, -1), // remove quotes
 						token.span
 					);
+				}
+				case TokenKind.If: {
+					return this._parseIfExpr();
 				}
 				case TokenKind.Ident: {
 					const ident = this._parseIdent();
