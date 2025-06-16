@@ -23,6 +23,7 @@
       "name": "playground",
       "version": "0.0.0",
       "dependencies": {
+        "@shikijs/monaco": "^3.6.0",
         "formula": "workspace:*",
         "monaco-editor": "^0.52.2",
         "shiki": "^3.6.0",
@@ -131,6 +132,8 @@
     "@shikijs/engine-oniguruma": ["@shikijs/engine-oniguruma@3.6.0", "", { "dependencies": { "@shikijs/types": "3.6.0", "@shikijs/vscode-textmate": "^10.0.2" } }, "sha512-nmOhIZ9yT3Grd+2plmW/d8+vZ2pcQmo/UnVwXMUXAKTXdi+LK0S08Ancrz5tQQPkxvjBalpMW2aKvwXfelauvA=="],
 
     "@shikijs/langs": ["@shikijs/langs@3.6.0", "", { "dependencies": { "@shikijs/types": "3.6.0" } }, "sha512-IdZkQJaLBu1LCYCwkr30hNuSDfllOT8RWYVZK1tD2J03DkiagYKRxj/pDSl8Didml3xxuyzUjgtioInwEQM/TA=="],
+
+    "@shikijs/monaco": ["@shikijs/monaco@3.6.0", "", { "dependencies": { "@shikijs/core": "3.6.0", "@shikijs/types": "3.6.0", "@shikijs/vscode-textmate": "^10.0.2" } }, "sha512-tn2KI3oipAQP3X0dvqBQ+k55cQufydABWmAUBJ67e/KxqGegAm8U252GKyivPqKizo++BpnAAz5Q/GGTnP0S7g=="],
 
     "@shikijs/themes": ["@shikijs/themes@3.6.0", "", { "dependencies": { "@shikijs/types": "3.6.0" } }, "sha512-Fq2j4nWr1DF4drvmhqKq8x5vVQ27VncF8XZMBuHuQMZvUSS3NBgpqfwz/FoGe36+W6PvniZ1yDlg2d4kmYDU6w=="],
 

@@ -1,8 +1,21 @@
 import * as monaco from "monaco-editor";
 import "./style.css";
 import { FormulaRuntime, Formula, NumberValue } from "formula";
+import { createHighlighter, type HighlighterCore } from "shiki";
+import { shikiToMonaco } from "@shikijs/monaco";
 
 console.log("Radhey Shyam");
+
+async function createFormulaHighlighter() {
+	const res = await fetch("/formula.json");
+	const data = await res.text();
+	const lang = JSON.parse(data);
+	const highlighter = await createHighlighter({
+		langs: [lang],
+		themes: ["ayu-dark", "monokai"],
+	});
+	return highlighter;
+}
 
 // Utility function to create a debounced version of a function
 function debounce<T extends (...args: any[]) => any>(
@@ -58,6 +71,7 @@ class ResultView extends Mountable {
 }
 
 class FormulaEditor extends Mountable {
+	private highlighter: HighlighterCore | null = null;
 	private header = document.createElement("header");
 	private result = new ResultView();
 	private editor: monaco.editor.IStandaloneCodeEditor | null = null;
@@ -103,22 +117,22 @@ class FormulaEditor extends Mountable {
 
 	private _initialCode: string;
 
-	override init(): void {
+	override async init() {
 		// Register the formula language
-		this.registerFormulaLanguage();
+		await this.registerFormulaLanguage();
 
 		// Create the editor
 		this.editor = monaco.editor.create(this.editorContainer, {
 			value: this._initialCode,
 			language: "formula",
-			theme: "vs-dark",
+			theme: "ayu-dark",
 			minimap: { enabled: false },
 			automaticLayout: true,
 			fontSize: 14,
 			lineNumbers: "off",
 			scrollBeyondLastLine: false,
-			roundedSelection: false,
-			padding: { top: 8 },
+			roundedSelection: true,
+			padding: { top: 0, bottom: 0 },
 		});
 
 		// Set up the change event listener for auto-run
@@ -227,25 +241,11 @@ class FormulaEditor extends Mountable {
 		this._view.append(buttonContainer);
 	}
 
-	private registerFormulaLanguage() {
-		// Register the formula language
+	private async registerFormulaLanguage() {
+		this.highlighter = await createFormulaHighlighter();
 		monaco.languages.register({ id: "formula" });
 
-		// Define the token provider for syntax highlighting
-		monaco.languages.setMonarchTokensProvider("formula", {
-			tokenizer: {
-				root: [
-					[/let|if|or|and/, "keyword"],
-					[/true|false/, "boolean"],
-					[/".*?"/, "string"],
-					[/'.*?'/, "string"],
-					[/\d+(\.\d+)?/, "number"],
-					[/\|/, "delimiter.pipe"],
-					[/\+|-|\*|\/|>=|<=|>|<|==|!=/, "operator"],
-					[/[a-zA-Z_][\w]*/, "identifier"],
-				],
-			},
-		});
+		shikiToMonaco(this.highlighter, monaco);
 
 		// Configure language features
 		monaco.languages.setLanguageConfiguration("formula", {
@@ -272,7 +272,16 @@ class FormulaEditor extends Mountable {
 
 		// Add intellisense/auto-completion
 		monaco.languages.registerCompletionItemProvider("formula", {
-			provideCompletionItems: () => {
+			provideCompletionItems: (model, position) => {
+				// Get word being typed
+				const word = model.getWordUntilPosition(position);
+				const range = {
+					startLineNumber: position.lineNumber,
+					endLineNumber: position.lineNumber,
+					startColumn: word.startColumn,
+					endColumn: word.endColumn,
+				};
+
 				const suggestions = [
 					{
 						label: "let",
@@ -281,6 +290,7 @@ class FormulaEditor extends Mountable {
 						insertTextRules:
 							monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						documentation: "Define local variables",
+						range: range,
 					},
 					{
 						label: "if",
@@ -289,6 +299,7 @@ class FormulaEditor extends Mountable {
 						insertTextRules:
 							monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						documentation: "Conditional expression",
+						range: range,
 					},
 					{
 						label: "lambda",
@@ -297,6 +308,7 @@ class FormulaEditor extends Mountable {
 						insertTextRules:
 							monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						documentation: "Create a lambda function",
+						range: range,
 					},
 					// Add more suggestions as needed
 				];
