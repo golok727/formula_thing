@@ -133,10 +133,22 @@ range(1, 100).map(|n|
 		(n % 5 == 0) ? "Buzz" : n
 	)
 `;
+const fizzBuzz1 = `
+range(1, 100).map(|n|
+	if(
+		n % 3 == 0 and n % 5 == 0, "Fizzbuzz",
+		if( n % 3 == 0, "Fizz", 
+				if(n % 5 == 0, "Buzz", n)
+			)
+	)
+)
+`;
 
 console.log("\n\n");
 console.log("Example FizzBuzz:\n--------------------");
 console.log(evaluateFormula(fizzBuzz, new Environment(rt)).asString());
+console.log("\n\n");
+console.log(evaluateFormula(fizzBuzz1, new Environment(rt)).asString());
 
 {
 	console.log("\n\n");
