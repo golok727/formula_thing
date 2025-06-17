@@ -5,7 +5,7 @@ import {
   CallExpr,
   Ident,
   LiteralExpr,
-} from './ast.js';
+} from './ast/index.js';
 import { span } from './span.js';
 
 /*

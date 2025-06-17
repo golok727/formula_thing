@@ -1,4 +1,4 @@
-import { Arguments } from '../../../arguments.js';
+import { Arguments } from './arguments.js';
 import { BaseValue, type Value } from '../../value.js';
 import { None } from '../none/index.js';
 

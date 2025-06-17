@@ -1,4 +1,5 @@
-import { None, type Value } from './core/index.js';
+import type { Value } from '../../value.js';
+import { None } from '../none/none.js';
 
 export class Arguments {
   constructor(public readonly raw: Value[]) {}

@@ -1,4 +1,4 @@
-import type { Arguments } from '../../../arguments.js';
+import type { Arguments } from '../fn/arguments.js';
 import { BaseValue, type PropertyAccessorMap } from '../../value.js';
 import { Fn } from '../fn/fn.js';
 import { NumberValue } from '../number/number.js';

@@ -1,6 +1,6 @@
 import * as monaco from 'monaco-editor';
 import './style.css';
-import { FormulaRuntime, Formula, NumberValue } from 'formula';
+import { FormulaRuntime, Formula, NumberValue, Instance } from 'formula';
 import { createHighlighter, type HighlighterCore } from 'shiki';
 import { shikiToMonaco } from '@shikijs/monaco';
 
@@ -177,7 +177,7 @@ class FormulaEditor extends Mountable {
       return;
     }
 
-    const instance = formula.createInstance(this.runtime);
+    const instance = new Instance(formula, this.runtime);
 
     try {
       const res = instance.eval();

@@ -15,7 +15,7 @@ import {
   UnaryExpr,
   UnaryOp,
   type Expr,
-} from '../ast.js';
+} from '../ast/index.js';
 import { span, type SrcSpan } from '../span.js';
 import { FormulaParseError, ParseErrorKind } from './error.js';
 import { Lexer } from './lexer.js';

@@ -3,7 +3,7 @@ import {
   getImpl,
   type Trait,
   type ValueConstructor,
-} from './index.js';
+} from './trait.js';
 
 export interface Value {
   readonly typeHint: string;

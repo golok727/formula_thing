@@ -1,21 +1,6 @@
-import { Printer } from './utils.js';
-import type { SrcSpan } from './span.js';
-import type { Visit, Visitor } from './visitor.js';
-import { TokenKind } from './parser/token.js';
-
-export abstract class Expr implements Visit {
-  constructor(public readonly span: SrcSpan) {}
-
-  abstract visit<Result>(visitor: Visitor<Result>): Result;
-
-  source(src: string): string {
-    return src.slice(this.span.start, this.span.end);
-  }
-
-  toString(_pretty = false): string {
-    return this.visit(new Printer());
-  }
-}
+import { TokenKind } from '../parser/token.js';
+import type { SrcSpan } from '../span.js';
+import { Expr, type Visitor } from './types.js';
 
 export class EmptyExpr extends Expr {
   visit<Result>(visitor: Visitor<Result>): Result {
@@ -127,6 +112,7 @@ export class ConditionalExpr extends Expr {
   ) {
     super(span);
   }
+
   visit<Result>(visitor: Visitor<Result>): Result {
     return visitor.visitConditionalExpr(this);
   }

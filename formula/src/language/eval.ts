@@ -11,9 +11,9 @@ import {
   type CallExpr,
   type LiteralExpr,
   type UnaryExpr,
-} from '../ast.js';
+  type Visitor,
+} from '../ast/index.js';
 import { stringifySpan } from '../span.js';
-import type { Visitor } from '../visitor.js';
 import {
   AddTrait,
   BooleanValue,

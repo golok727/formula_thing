@@ -2,6 +2,7 @@ import { CallTrait } from '../../op/index.js';
 import type { Value } from '../../value.js';
 import { Fn } from './fn.js';
 
+export * from './arguments.js';
 export * from './fn.js';
 
 Fn.addImpl(CallTrait, {

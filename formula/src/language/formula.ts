@@ -1,7 +1,7 @@
-import type { Expr } from '../ast.js';
+import { FormulaPrinter } from './../ast/index.js';
+import type { Expr, Visit, Visitor } from '../ast/index.js';
 import { FormulaParseError } from '../parser/error.js';
 import { Parser } from '../parser/parse.js';
-import type { Visit, Visitor } from '../visitor.ts';
 
 export class CompilationError extends Error {
   constructor(message: string) {
@@ -58,7 +58,8 @@ export class Formula implements Visit {
     }
   }
 
-  toString(pretty?: boolean): string {
-    return this._root?.toString(pretty) ?? '<not compiled>';
+  toString(_pretty?: boolean): string {
+    const str = this._root?.visit(new FormulaPrinter());
+    return str ?? '<not compiled>';
   }
 }

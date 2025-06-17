@@ -1,5 +1,4 @@
-import { Fn, type Value } from './core/index.js';
-import type { Arguments } from './arguments.js';
+import { Fn, type Value, Arguments } from './core/index.js';
 
 const NAME_VALIDATOR = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
