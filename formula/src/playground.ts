@@ -153,3 +153,19 @@ console.log(evaluateFormula(fizzBuzz1, new Environment(rt)).asString());
 		console.log(evaluateFormula(src, env).asString());
 	}
 }
+
+{
+	console.log("\n\n");
+	console.log("Example String:\n--------------------");
+	const env = new Environment(rt);
+
+	{
+		const src = String.raw`
+			let(
+				a = [1, 2, 3, 4, 5],
+				a.map(string).join(",\n")
+			)
+		`;
+		console.log(evaluateFormula(src, env).asString());
+	}
+}

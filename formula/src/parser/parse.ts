@@ -350,10 +350,9 @@ export class Parser {
 				}
 				case TokenKind.String: {
 					const token = this._nextToken()!; // consume the literal
-					return new LiteralExpr(
-						token.source(this.source).slice(1, -1), // remove quotes
-						token.span
-					);
+					const rawString = token.source(this.source).slice(1, -1); // remove quotes
+					const processedString = this._processEscapeSequences(rawString);
+					return new LiteralExpr(processedString, token.span);
 				}
 				case TokenKind.Boolean: {
 					const token = this._nextToken()!; // consume the literal
@@ -488,6 +487,36 @@ export class Parser {
 			console.error(error);
 			return [null, error];
 		}
+	}
+
+	private _processEscapeSequences(str: string): string {
+		return str.replace(/\\(.)/g, (_, char) => {
+			switch (char) {
+				case "n":
+					return "\n";
+				case "t":
+					return "\t";
+				case "r":
+					return "\r";
+				case "b":
+					return "\b";
+				case "f":
+					return "\f";
+				case "v":
+					return "\v";
+				case "0":
+					return "\0";
+				case "\\":
+					return "\\";
+				case '"':
+					return '"';
+				case "'":
+					return "'";
+				// Add more escape sequences as needed
+				default:
+					return char; // For any other escaped character, just return the character
+			}
+		});
 	}
 }
 
