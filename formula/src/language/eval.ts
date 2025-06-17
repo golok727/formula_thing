@@ -77,11 +77,10 @@ export class Evaluator implements Visitor<Value> {
     const local = this._capture();
     const env = local._scope;
 
-    expr.bindings.map((binding) => {
+    for (const binding of expr.bindings) {
       const value = binding.value.visit(local);
-      env.set(binding.target.name, value);
-      return value;
-    });
+      env.set(binding.target.name, value, true);
+    }
 
     return expr.body.visit(local);
   }
