@@ -1,20 +1,20 @@
 {
-	"name": "formula",
-	"module": "index.ts",
-	"type": "module",
-	"private": true,
-	"devDependencies": {
-		"@types/bun": "latest"
-	},
-	"exports": {
-		".": {
-			"import": "./src/index.ts"
-		}
-	},
-	"scripts": {
-		"repl": "bun run ./src/repl.ts"
-	},
-	"peerDependencies": {
-		"typescript": "^5"
-	}
+  "name": "formula",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "repl": "bun run ./src/repl.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
 }

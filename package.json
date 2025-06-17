@@ -1,20 +1,21 @@
 {
-	"name": "formula_repo",
-	"module": "index.ts",
-	"type": "module",
-	"workspaces": [
-		"./formula",
-		"./playground"
-	],
-	"private": true,
-	"devDependencies": {
-		"@types/bun": "latest"
-	},
-	"scripts": {
-		"repl": "bun --filter formula repl"
-	},
-	"peerDependencies": {
-		"typescript": "^5"
-	},
-	"dependencies": {}
+  "name": "formula_repo",
+  "module": "index.ts",
+  "type": "module",
+  "workspaces": [
+    "./formula",
+    "./playground"
+  ],
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "^3.5.3"
+  },
+  "scripts": {
+    "repl": "bun --filter formula repl"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {}
 }
