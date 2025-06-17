@@ -173,7 +173,6 @@ class FormulaEditor extends Mountable {
     const [formula, error] = new Formula(text).compileSafe();
 
     if (error) {
-      console.error('Failed to compile formula:', error);
       this.result.update(`${error.message}`);
       return;
     }

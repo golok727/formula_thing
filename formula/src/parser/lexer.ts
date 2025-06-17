@@ -1,6 +1,6 @@
 import { span, type SrcSpan } from '../span.js';
 import { Cursor } from './cursor.js';
-import { ParseError, ParseErrorKind } from './error.js';
+import { FormulaParseError, ParseErrorKind } from './error.js';
 import { Token, TokenKind, tryGetKeywordFromString } from './token.js';
 
 const NUMBER_VALIDATOR =
@@ -69,7 +69,7 @@ export class Lexer implements Iterable<Token> {
     const end = this.offset;
 
     if (kind === TokenKind.Unknown) {
-      throw new ParseError(
+      throw new FormulaParseError(
         ParseErrorKind.UnexpectedToken,
         span(start, end),
         `Unexpected character '${c}' at position ${start}`,
@@ -184,7 +184,7 @@ export class Lexer implements Iterable<Token> {
     }
 
     if (!this._parseNumberOfRadix(10)) {
-      throw new ParseError(
+      throw new FormulaParseError(
         ParseErrorKind.EmptyExponent,
         span(this.offset, this.offset),
         `Empty exponent part at position ${this.offset}`,
@@ -211,7 +211,7 @@ export class Lexer implements Iterable<Token> {
       if (next === 'x' || next === 'X') {
         this.chars.next(); // consume the 'x' or 'X'
         if (!this._parseNumberOfRadix(16)) {
-          throw new ParseError(
+          throw new FormulaParseError(
             ParseErrorKind.InvalidHexLiteral,
             span(start, this.offset),
             `Invalid hexadecimal number`,
@@ -220,7 +220,7 @@ export class Lexer implements Iterable<Token> {
       } else if (next === 'b' || next === 'B') {
         this.chars.next(); // consume the 'b' or 'B'
         if (!this._parseNumberOfRadix(2)) {
-          throw new ParseError(
+          throw new FormulaParseError(
             ParseErrorKind.InvalidHexLiteral,
             span(start, this.offset),
             `Invalid binary number`,
@@ -229,7 +229,7 @@ export class Lexer implements Iterable<Token> {
       } else if (next === 'o' || next === 'O') {
         this.chars.next(); // consume the 'o' or 'O'
         if (!this._parseNumberOfRadix(8)) {
-          throw new ParseError(
+          throw new FormulaParseError(
             ParseErrorKind.InvalidOctalLiteral,
             span(start, this.offset),
             `Invalid octal number`,
@@ -250,7 +250,7 @@ export class Lexer implements Iterable<Token> {
     for (;;) {
       let next = this.chars.peek();
       if (next === undefined) {
-        throw new ParseError(
+        throw new FormulaParseError(
           ParseErrorKind.UnterminatedStringLiteral,
           span(start, this.offset),
           `Unterminated string starting at position ${start}`,

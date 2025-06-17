@@ -17,7 +17,7 @@ import {
   type Expr,
 } from '../ast.js';
 import { span, type SrcSpan } from '../span.js';
-import { ParseError, ParseErrorKind } from './error.js';
+import { FormulaParseError, ParseErrorKind } from './error.js';
 import { Lexer } from './lexer.js';
 import { Token, TokenKind } from './token.js';
 
@@ -70,7 +70,7 @@ export class Parser {
     return items;
   }
 
-  private _expectOne(kind: TokenKind, error?: () => ParseError): Token {
+  private _expectOne(kind: TokenKind, error?: () => FormulaParseError): Token {
     if (this.t0?.kind === kind) {
       return this._nextToken()!;
     }
@@ -79,7 +79,7 @@ export class Parser {
       throw error();
     }
     const start = this.t0?.span.start ?? this.source.length;
-    throw ParseError.ExpectedToken(kind, {
+    throw FormulaParseError.ExpectedToken(kind, {
       start,
       end: start + 1,
     });
@@ -127,7 +127,7 @@ export class Parser {
     const body = this._parseExpr();
     if (!body) {
       const errSpan = span(paramDelimSpan.end, paramDelimSpan.end + 1);
-      throw new ParseError(
+      throw new FormulaParseError(
         ParseErrorKind.EmptyLambda,
         errSpan,
         `Expected a expression after lambda parameters, but found nothing.`,
@@ -179,7 +179,7 @@ export class Parser {
     const token = this._nextToken(); // consume the identifier
 
     if (!token || token.kind !== TokenKind.Ident) {
-      throw new ParseError(
+      throw new FormulaParseError(
         ParseErrorKind.ExpectedIdentifier,
         span(start, start + 1),
         `Expected an identifier but found '${token?.kind ?? TokenKind.Eof}'`,
@@ -197,7 +197,7 @@ export class Parser {
     const startSpan = this._expectOne(TokenKind.Question).span; // consume '?'
     const consequent = this._parseExpr();
     if (!consequent) {
-      throw new ParseError(
+      throw new FormulaParseError(
         ParseErrorKind.ExpectedExpression,
         span(startSpan.start, startSpan.start + 1),
         "Expected an expression after '?' in ternary expression",
@@ -206,7 +206,7 @@ export class Parser {
     this._expectOne(TokenKind.Colon); // consume ':'
     const alternate = this._parseExpr();
     if (!alternate) {
-      throw new ParseError(
+      throw new FormulaParseError(
         ParseErrorKind.ExpectedExpression,
         span(startSpan.start, startSpan.start + 1),
         "Expected an expression after ':' in ternary expression",
@@ -230,7 +230,7 @@ export class Parser {
       this._expectOne(TokenKind.Eq); // consume '='
       const value = this._parseExpr();
       if (!value) {
-        throw new ParseError(
+        throw new FormulaParseError(
           ParseErrorKind.ExpectedExpression,
           span(ident.span.end, ident.span.end + 1),
           `Expected an expression after '=' in assignment to '${ident.source(
@@ -273,7 +273,7 @@ export class Parser {
       }, TokenKind.Comma);
 
       if (bindings.length === 0) {
-        throw new ParseError(
+        throw new FormulaParseError(
           ParseErrorKind.EmptyLetBindings,
           span(start, start + 1),
           `Expected at least one binding in 'let' expression`,
@@ -283,7 +283,7 @@ export class Parser {
       let body: Expr | null = this._parseExpr();
 
       if (!body) {
-        throw new ParseError(
+        throw new FormulaParseError(
           ParseErrorKind.EmptyLetBody,
           span(start, start + 1),
           `Expected a body expression after bindings in 'let' expression`,
@@ -309,7 +309,7 @@ export class Parser {
       // we can use seriesOf here but we just make it strict
       const condition = this._parseExpr();
       if (!condition) {
-        throw ParseError.MissingArguments(
+        throw FormulaParseError.MissingArguments(
           TokenKind.If,
           3,
           0,
@@ -321,7 +321,7 @@ export class Parser {
       const consequent = this._parseExpr();
 
       if (!consequent) {
-        throw ParseError.MissingArguments(
+        throw FormulaParseError.MissingArguments(
           TokenKind.If,
           3,
           1,
@@ -333,7 +333,7 @@ export class Parser {
       const alternate = this._parseExpr();
 
       if (!alternate) {
-        throw ParseError.MissingArguments(
+        throw FormulaParseError.MissingArguments(
           TokenKind.If,
           3,
           2,
@@ -384,7 +384,7 @@ export class Parser {
           const token = this._nextToken()!; // consume the literal
           const value = Number(token.source(this.source));
           if (isNaN(value)) {
-            throw new ParseError(
+            throw new FormulaParseError(
               ParseErrorKind.InvalidNumberLiteral,
               token.span,
               `Invalid number literal: ${token.source(this.source)}`,
@@ -416,7 +416,7 @@ export class Parser {
           return this._parseParenthesized(() => {
             const expr = this._parseExpr();
             if (!expr) {
-              throw new ParseError(
+              throw new FormulaParseError(
                 ParseErrorKind.ExpectedExpression,
                 this.t0?.span ?? {
                   start: this.source.length,
@@ -440,7 +440,7 @@ export class Parser {
           const not = this._nextToken()!; // consume 'not'
           const expr = this._parseExprUnit();
           if (!expr) {
-            throw new ParseError(
+            throw new FormulaParseError(
               ParseErrorKind.ExpectedExpression,
               not.span,
               `Expected an expression after '${not.source(this.source)}'.`,
@@ -456,7 +456,7 @@ export class Parser {
           const minus = this._nextToken()!; // consume '-'
           const expr = this._parseExprUnit();
           if (!expr) {
-            throw new ParseError(
+            throw new FormulaParseError(
               ParseErrorKind.ExpectedExpression,
               minus.span,
               `Expected an expression after '${minus.source(this.source)}'.`,
@@ -502,7 +502,7 @@ export class Parser {
           errLoc = { start: this.t0.span.start - 1, end: this.t0.span.end - 1 };
         }
         // no expr after operator
-        throw new ParseError(
+        throw new FormulaParseError(
           ParseErrorKind.ExpectedExpression,
           errLoc,
           `Expected an expression, but found nothing after operator.`,
@@ -540,7 +540,7 @@ export class Parser {
     const res = this._parseExpr();
 
     if (this.t0) {
-      throw new ParseError(
+      throw new FormulaParseError(
         ParseErrorKind.ExpectedEndOfExpression,
         span(this.t0.span.start, this.t0.span.end),
         `Expected end of expression found '${this.t0.source(this.source)}'`,

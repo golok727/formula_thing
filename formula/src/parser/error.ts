@@ -22,7 +22,7 @@ export const ParseErrorKind = {
 export type ParseErrorKind =
   (typeof ParseErrorKind)[keyof typeof ParseErrorKind];
 
-export class ParseError extends Error {
+export class FormulaParseError extends Error {
   constructor(
     public readonly kind: ParseErrorKind,
     public span: SrcSpan,
@@ -37,7 +37,7 @@ export class ParseError extends Error {
     got: number,
     span: SrcSpan,
   ) {
-    return new ParseError(
+    return new FormulaParseError(
       ParseErrorKind.MissingArguments,
       span,
       `Missing arguments for '${callee}': expected ${required}, got ${got}`,
@@ -45,7 +45,7 @@ export class ParseError extends Error {
   }
 
   static ExpectedToken(expectedKind: TokenKind, span: SrcSpan) {
-    return new ParseError(
+    return new FormulaParseError(
       ParseErrorKind.ExpectedToken,
       span,
       `Expected '${expectedKind}'`,

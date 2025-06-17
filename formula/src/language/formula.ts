@@ -1,5 +1,5 @@
 import type { Expr } from '../ast.js';
-import { ParseError } from '../parser/error.js';
+import { FormulaParseError } from '../parser/error.js';
 import { Parser } from '../parser/parse.js';
 import type { Visit, Visitor } from '../visitor.ts';
 import { Environment } from './environment.js';
@@ -53,13 +53,13 @@ export class Formula implements Visit {
   compileSafe():
     | [formula: Formula, error: null]
     | [formula: null, error: Error] {
-    const parser = new Parser(this.source);
     try {
+      const parser = new Parser(this.source);
       const root = parser.parse();
       this._root = root;
       return [this, null];
     } catch (e) {
-      if (e instanceof ParseError) {
+      if (e instanceof FormulaParseError) {
         return [
           null,
           new CompilationError(
