@@ -11,9 +11,9 @@ import type {
   MemberExpr,
   UnaryExpr,
 } from './ast.js';
-import { FormulaVisitor } from './visitor.js';
+import type { Visitor } from './visitor.js';
 
-export class FormulaPrinter extends FormulaVisitor<string> {
+export class FormulaPrinter implements Visitor<string> {
   visitAssignExpr(expr: AssignmentExpr): string {
     return `${expr.target.visit(this)} = ${expr.value.visit(this)}`;
   }
