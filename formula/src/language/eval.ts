@@ -39,9 +39,7 @@ import { Environment } from './environment.js';
 
 export class RefError extends Error {
   constructor(public ident: Ident) {
-    super(
-      `RefError: '${ident.name}' is not defined at ${stringifySpan(ident.span)}`,
-    );
+    super(`'${ident.name}' is not defined at ${stringifySpan(ident.span)}`);
     this.name = 'RefError';
   }
 }
