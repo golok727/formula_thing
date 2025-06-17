@@ -1,4 +1,4 @@
-import { PropertyAccessorTrait, type PropertyAccessor } from './op.js';
+import { PropertyAccessorTrait, type PropertyAccessor } from './op/index.js';
 import { None } from './primitives/index.js';
 
 import { addImpl, type ValueConstructor } from './trait.js';

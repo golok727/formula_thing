@@ -1,4 +1,4 @@
-import type { Eq, Not } from '../../op.js';
+import type { Eq, Not } from '../../op/types.js';
 import type { Value } from '../../value.js';
 import { BooleanValue } from './bool.js';
 

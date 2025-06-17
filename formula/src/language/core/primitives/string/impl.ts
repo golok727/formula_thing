@@ -1,4 +1,4 @@
-import { Ordering, type Add, type Eq, type Ord } from '../../op.js';
+import { Ordering, type Add, type Eq, type Ord } from '../../op/types.js';
 import type { Value } from '../../value.js';
 import { BooleanValue } from '../bool/bool.js';
 import { NumberValueImpl } from '../number/impl.js';

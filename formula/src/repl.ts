@@ -4,6 +4,7 @@ import {
   Environment,
   Fn,
   implPropertyAccessor,
+  Instance,
   None,
   NumberValue,
   StringValue,
@@ -12,8 +13,16 @@ import {
 } from './language/index.js';
 import { FormulaRuntime } from './std/runtime.js';
 
+export function evaluateFormula(
+  source: string,
+  env: Environment = new FormulaRuntime(),
+): Value {
+  const formula = new Formula(source, 'Eval').compile();
+  const instance = new Instance(formula, env);
+  return instance.eval();
+}
+
 import readline from 'node:readline/promises';
-import { evaluateFormula } from './utils.js';
 
 let running = true;
 

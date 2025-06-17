@@ -2,8 +2,6 @@ import type { Expr } from '../ast.js';
 import { FormulaParseError } from '../parser/error.js';
 import { Parser } from '../parser/parse.js';
 import type { Visit, Visitor } from '../visitor.ts';
-import { Environment } from './environment.js';
-import { Instance } from './instance.js';
 
 export class CompilationError extends Error {
   constructor(message: string) {
@@ -29,17 +27,6 @@ export class Formula implements Visit {
 
   isCompiled(): boolean {
     return this._root !== null;
-  }
-
-  /**
-   * Create an instance of the formula. Will throw an error if the formula is not compiled.
-   */
-  createInstance(): Instance<Environment>;
-  createInstance<Env extends Environment = Environment>(
-    env: Env,
-  ): Instance<Env>;
-  createInstance(env?: Environment): Instance<Environment> {
-    return new Instance(this, env ?? new Environment());
   }
 
   compile(): this {

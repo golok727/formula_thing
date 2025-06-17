@@ -1,5 +1,4 @@
-import type { Environment } from '../../../environment.js';
-import { CallTrait } from '../../op.js';
+import { CallTrait } from '../../op/index.js';
 import type { Value } from '../../value.js';
 import { Fn } from './fn.js';
 

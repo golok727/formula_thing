@@ -1,6 +1,4 @@
-import type { PropertyAccessorMap } from '../../op.js';
-import { BaseValue } from '../../value.js';
-import { Fn } from '../fn/fn.js';
+import { BaseValue, type PropertyAccessorMap } from '../../value.js';
 
 export class BooleanValue extends BaseValue {
   readonly typeHint: string = 'Boolean';

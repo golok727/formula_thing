@@ -1,5 +1,4 @@
-import type { PropertyAccessorMap } from './op.js';
-import type { Value } from './value.js';
+import type { PropertyAccessorMap, Value } from './value.js';
 
 export type Trait<T> = {
   readonly id: string;

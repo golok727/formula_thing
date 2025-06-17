@@ -1,7 +1,6 @@
 import {
   addImpl,
   getImpl,
-  type PropertyAccessorMap,
   type Trait,
   type ValueConstructor,
 } from './index.js';
@@ -64,3 +63,8 @@ export abstract class BaseValue implements Value {
 
   static readonly properties: PropertyAccessorMap<any> = {};
 }
+
+export type PropertyAccessorMap<Self extends Value = Value> = Record<
+  string,
+  (me: Self) => Value
+>;

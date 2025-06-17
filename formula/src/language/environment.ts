@@ -1,7 +1,26 @@
-import type { EnvDefineConfig, ValueDefinition } from './types.js';
 import { Fn, type Value } from './core/index.js';
+import type { Arguments } from './arguments.js';
 
 const NAME_VALIDATOR = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+export type EnvDefineConfig<Env extends Environment = Environment> =
+  | FunctionDefinition<Env>
+  | ValueDefinition<Env>;
+
+export type ValueDefinition<Env extends Environment = Environment> = {
+  type: 'value';
+  linkname: string;
+  description?: string;
+  override?: boolean;
+  value: Value | ((env: Env) => Value);
+};
+
+export type FunctionDefinition<Env extends Environment = Environment> = {
+  type: 'function';
+  linkname: string;
+  description?: string;
+  fn: (env: Env, args: Arguments) => Value;
+};
 
 function validateName(name: string): void {
   if (!NAME_VALIDATOR.test(name)) {

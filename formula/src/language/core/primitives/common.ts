@@ -5,13 +5,8 @@ import {
   NegTrait,
   RemTrait,
   SubTrait,
-  type Add,
-  type Div,
-  type Mul,
-  type Neg,
-  type Rem,
-  type Sub,
-} from '../op.js';
+} from '../op/index.js';
+import type { Add, Div, Mul, Neg, Rem, Sub } from '../op/types.js';
 import { addImpl, type ValueConstructor } from '../trait.js';
 import type { Value } from '../value.js';
 import { NumberValue } from './number/number.js';

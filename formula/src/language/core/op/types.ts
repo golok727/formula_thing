@@ -1,8 +1,5 @@
-import type { Environment } from '../environment.js';
-import type { BooleanValue } from './primitives/bool/bool.js';
-import { defineTrait } from './trait.js';
-
-import type { Value } from './value.js';
+import type { BooleanValue } from '../primitives/index.js';
+import type { Value } from '../value.js';
 
 export const Ordering = {
   Lt: -1,
@@ -46,22 +43,3 @@ export type Call<T extends Value = Value> = {
 export type PropertyAccessor<T extends Value = Value> = {
   getProperty(me: T, prop: string): Value;
 };
-
-export type PropertyAccessorMap<Self extends Value = Value> = Record<
-  string,
-  (me: Self) => Value
->;
-
-export const AddTrait = defineTrait<Add>('_core_AddTrait');
-export const SubTrait = defineTrait<Sub>('_core_SubTrait');
-export const MulTrait = defineTrait<Mul>('_core_MulTrait');
-export const DivTrait = defineTrait<Div>('_core_DivTrait');
-export const RemTrait = defineTrait<Rem>('_core_RemTrait');
-export const OrdTrait = defineTrait<Ord>('_core_OrdTrait');
-export const EqTrait = defineTrait<Eq>('_core_EqTrait');
-export const NegTrait = defineTrait<Neg>('_core_NegTrait');
-export const NotTrait = defineTrait<Not>('_core_NotTrait');
-export const CallTrait = defineTrait<Call>('_core_CallTrait');
-export const PropertyAccessorTrait = defineTrait<PropertyAccessor>(
-  '_core_PropertyAccessorTrait',
-);

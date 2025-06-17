@@ -7,9 +7,19 @@ import {
   Formula,
   type FunctionDefinition,
   None,
+  Instance,
+  type Value,
 } from './language/index.js';
 import { FormulaRuntime } from './std/runtime.js';
-import { evaluateFormula } from './utils.js';
+
+export function evaluateFormula(
+  source: string,
+  env: Environment = new FormulaRuntime(),
+): Value {
+  const formula = new Formula(source, 'Eval').compile();
+  const instance = new Instance(formula, env);
+  return instance.eval();
+}
 
 const source1 = new MockDataSource({
   Age: {
@@ -109,8 +119,8 @@ if (error) {
   throw new Error('Compilation failed');
 }
 // each cell can have its own instance of the formula
-const row1 = formula.createInstance(new RowEnvironment('1', sourceEnv));
-const row2 = formula.createInstance(new RowEnvironment('2', sourceEnv));
+const row1 = new Instance(formula, new RowEnvironment('1', sourceEnv));
+const row2 = new Instance(formula, new RowEnvironment('2', sourceEnv));
 
 console.log(row1.eval().asString());
 console.log(row2.eval().asString());

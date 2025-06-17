@@ -12,10 +12,6 @@ import {
   type LiteralExpr,
   type MemberExpr,
 } from './ast.js';
-import { FormulaRuntime } from './std/runtime.js';
-import { Formula } from './language/formula.js';
-import type { Environment } from './language/environment.js';
-import type { Value } from './language/index.js';
 
 export class Printer implements Visitor<string> {
   visitAssignExpr(expr: AssignmentExpr): string {
@@ -75,13 +71,4 @@ export class Printer implements Visitor<string> {
   visitMemberExpr(expr: MemberExpr): string {
     return `${expr.referer.visit(this)}.${expr.property.visit(this)}`;
   }
-}
-
-export function evaluateFormula(
-  source: string,
-  env: Environment = new FormulaRuntime(),
-): Value {
-  const formula = new Formula(source, 'Eval').compile();
-  const instance = formula.createInstance(env);
-  return instance.eval();
 }

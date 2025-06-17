@@ -1,4 +1,4 @@
-import { BaseValue, type Value } from '../../value.js';
+import { BaseValue } from '../../value.js';
 
 export class NoneValue extends BaseValue {
   readonly typeHint: string = 'None';

@@ -1,6 +1,5 @@
-import type { Environment } from './environment.js';
+import type { Environment, EnvDefineConfig } from './environment.js';
 import type { Formula } from './formula.js';
-import type { EnvDefineConfig } from './types.js';
 
 import { Evaluator } from './eval.js';
 

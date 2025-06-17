@@ -1,4 +1,4 @@
-import type { Eq } from '../../op.js';
+import type { Eq } from '../../op/types.js';
 import type { Value } from '../../value.js';
 import { BooleanValue } from '../bool/bool.js';
 import { NoneValue } from './none.js';
