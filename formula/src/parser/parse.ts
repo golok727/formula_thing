@@ -512,9 +512,8 @@ export class Parser {
 					return '"';
 				case "'":
 					return "'";
-				// Add more escape sequences as needed
 				default:
-					return char; // For any other escaped character, just return the character
+					return char;
 			}
 		});
 	}
