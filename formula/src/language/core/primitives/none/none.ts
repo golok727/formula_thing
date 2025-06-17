@@ -23,3 +23,5 @@ export class NoneValue extends BaseValue {
     return val instanceof NoneValue;
   }
 }
+
+export const None = new NoneValue();

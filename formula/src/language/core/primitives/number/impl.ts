@@ -1,7 +1,7 @@
 import { Ordering, type Eq, type Ord } from '../../op.js';
 import type { Value } from '../../value.js';
-import { BooleanValue } from '../bool/bool.js';
 import { NumberValue } from './number.js';
+import { BooleanValue } from '../bool/bool.js';
 
 export type NumberImplementations = Ord & Eq<NumberValue>;
 

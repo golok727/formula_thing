@@ -5,10 +5,8 @@ import { implCoreArithmetic } from '../common.js';
 import { StringValueImpl } from './impl.js';
 import { StringValue } from './string.js';
 
-export * from './string.js';
-export * from './impl.js';
-
 implCoreArithmetic(StringValue);
+implPropertyAccessor(StringValue);
 
 StringValue.addImpl(AddTrait, StringValueImpl, /* Replace*/ true)
   .addImpl(OrdTrait, StringValueImpl)
@@ -16,4 +14,5 @@ StringValue.addImpl(AddTrait, StringValueImpl, /* Replace*/ true)
 // inherit from boolean
 StringValue.addImpl(NotTrait, BoolValueImpl);
 
-implPropertyAccessor(StringValue);
+export * from './impl.js';
+export * from './string.js';

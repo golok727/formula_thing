@@ -17,6 +17,7 @@ import {
   type Expr,
 } from '../ast.js';
 import { span, type SrcSpan } from '../span.js';
+import { ParseError, ParseErrorKind } from './error.js';
 import { Lexer } from './lexer.js';
 import { Token, TokenKind } from './token.js';
 
@@ -34,8 +35,8 @@ export class Parser {
 
   constructor(public readonly source: string) {
     this.tokens = new Lexer(source);
-    this.t0 = this.tokens.next() ?? null;
-    this.t1 = this.tokens.next() ?? null;
+    this.t0 = this.tokens.next();
+    this.t1 = this.tokens.next();
   }
 
   private _nextToken(): Token | null {
@@ -442,7 +443,8 @@ export class Parser {
       } else if (exprStack.length === 0) {
         return null;
       } else {
-        throw new Error(`Expected a expression after operator`);
+        // no expr after operator
+        throw new ParseError(ParseErrorKind.ExpectedExpression, span(0, 0));
       }
 
       const mayBeOp = this.t0;
