@@ -1,5 +1,6 @@
 import { span, type SrcSpan } from '../span.js';
 import { Cursor } from './cursor.js';
+import { ParseError, ParseErrorKind } from './error.js';
 import { Token, TokenKind, tryGetKeywordFromString } from './token.js';
 
 const NUMBER_VALIDATOR =
@@ -68,7 +69,11 @@ export class Lexer implements Iterable<Token> {
     const end = this.offset;
 
     if (kind === TokenKind.Unknown) {
-      throw new Error(`Unexpected character '${c}' at position ${start}`);
+      throw new ParseError(
+        ParseErrorKind.UnexpectedToken,
+        span(start, end),
+        `Unexpected character '${c}' at position ${start}`,
+      );
     }
 
     return [kind!, span(start, end)];
@@ -179,7 +184,11 @@ export class Lexer implements Iterable<Token> {
     }
 
     if (!this._parseNumberOfRadix(10)) {
-      throw new Error(`Expected a exponent part ${this.offset}`);
+      throw new ParseError(
+        ParseErrorKind.EmptyExponent,
+        span(this.offset, this.offset),
+        `Empty exponent part at position ${this.offset}`,
+      );
     }
   }
 
@@ -202,17 +211,29 @@ export class Lexer implements Iterable<Token> {
       if (next === 'x' || next === 'X') {
         this.chars.next(); // consume the 'x' or 'X'
         if (!this._parseNumberOfRadix(16)) {
-          throw new Error(`Invalid hexadecimal number at position ${start}`);
+          throw new ParseError(
+            ParseErrorKind.InvalidHexLiteral,
+            span(start, this.offset),
+            `Invalid hexadecimal number`,
+          );
         }
       } else if (next === 'b' || next === 'B') {
         this.chars.next(); // consume the 'b' or 'B'
         if (!this._parseNumberOfRadix(2)) {
-          throw new Error(`Invalid binary number at position ${start}`);
+          throw new ParseError(
+            ParseErrorKind.InvalidHexLiteral,
+            span(start, this.offset),
+            `Invalid binary number`,
+          );
         }
       } else if (next === 'o' || next === 'O') {
         this.chars.next(); // consume the 'o' or 'O'
         if (!this._parseNumberOfRadix(8)) {
-          throw new Error(`Invalid octal number at position ${start}`);
+          throw new ParseError(
+            ParseErrorKind.InvalidOctalLiteral,
+            span(start, this.offset),
+            `Invalid octal number`,
+          );
         }
       } else {
         this._parseDecimalNumber();
@@ -221,13 +242,6 @@ export class Lexer implements Iterable<Token> {
       this._parseDecimalNumber();
     }
 
-    let end = this.offset;
-    let numStr = this.source.slice(start, end);
-    if (!NUMBER_VALIDATOR.test(numStr)) {
-      throw new Error(
-        `Invalid number format at position ${start}: '${numStr}'`,
-      );
-    }
     return TokenKind.Number;
   }
   /* Parse number end */
@@ -236,13 +250,16 @@ export class Lexer implements Iterable<Token> {
     for (;;) {
       let next = this.chars.peek();
       if (next === undefined) {
-        throw new Error(`Unterminated string starting at position ${start}`);
+        throw new ParseError(
+          ParseErrorKind.UnterminatedStringLiteral,
+          span(start, this.offset),
+          `Unterminated string starting at position ${start}`,
+        );
       }
       if (next === quoteChar) {
         this.chars.next(); // consume the closing quote
         return TokenKind.String;
       } else {
-        // todo should we allow multi-line strings?
         this.chars.next(); // consume the character
       }
     }

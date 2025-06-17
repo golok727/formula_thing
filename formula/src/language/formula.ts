@@ -1,4 +1,5 @@
 import type { Expr } from '../ast.js';
+import { ParseError } from '../parser/error.js';
 import { Parser } from '../parser/parse.js';
 import type { Visit, Visitor } from '../visitor.ts';
 import { Environment } from './environment.js';
@@ -42,25 +43,32 @@ export class Formula implements Visit {
   }
 
   compile(): this {
-    const errors = this.compileSafe()[1];
-    if (errors) {
-      console.error('Failed to compile formula:', this.name, 'Errors:', errors);
-      throw new Error(`Compilation failed for formula "${this.name}"`);
+    const error = this.compileSafe()[1];
+    if (error) {
+      throw error;
     }
     return this;
   }
 
   compileSafe():
     | [formula: Formula, error: null]
-    | [formula: null, error: CompilationError] {
+    | [formula: null, error: Error] {
     const parser = new Parser(this.source);
-    let [root, error] = parser.parse();
-    if (error) {
-      // todo - handle errors properly
-      return [null, new CompilationError(`ParseError: ${error}`)];
+    try {
+      const root = parser.parse();
+      this._root = root;
+      return [this, null];
+    } catch (e) {
+      if (e instanceof ParseError) {
+        return [
+          null,
+          new CompilationError(
+            `ParseError: ${e.message} at [${e.span.start}:${e.span.end}]`,
+          ),
+        ];
+      }
+      throw e;
     }
-    this._root = root;
-    return [this, null];
   }
 
   toString(pretty?: boolean): string {

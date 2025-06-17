@@ -1,8 +1,13 @@
-import type { Formula } from './formula.ts';
-import { Instance } from './instance.js';
 import type { EnvDefineConfig, ValueDefinition } from './types.js';
-import { Fn, None, type Value } from './core/index.js';
+import { Fn, type Value } from './core/index.js';
 
+const NAME_VALIDATOR = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+function validateName(name: string): void {
+  if (!NAME_VALIDATOR.test(name)) {
+    throw new Error(`Invalid name '${name}'.`);
+  }
+}
 export class Environment {
   private _values: Map<string, ValueDefinition> = new Map();
 
@@ -42,6 +47,7 @@ export class Environment {
         value: new Fn((args) => def.fn(this, args), def.linkname),
       });
     } else if (def.type === 'value') {
+      validateName(def.linkname);
       if (!def.override && this._values.has(def.linkname)) {
         throw new Error(`Name '${def.linkname}' is already defined.`);
       }

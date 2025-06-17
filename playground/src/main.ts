@@ -78,6 +78,7 @@ class FormulaEditor extends Mountable {
   private editorContainer: HTMLElement;
   private runtime = new FormulaRuntime();
   private debouncedRunFormula: () => void;
+  private cursorPositionDisplay: HTMLElement = document.createElement('div');
 
   constructor(initialText = '') {
     super();
@@ -155,6 +156,14 @@ class FormulaEditor extends Mountable {
         this.editor.layout();
       }
     });
+
+    // Set up cursor position tracking
+    if (this.editor && this.cursorPositionDisplay) {
+      this.editor.onDidChangeCursorPosition((e) => {
+        const offset = this.editor?.getModel()?.getOffsetAt(e.position) || 0;
+        this.cursorPositionDisplay.textContent = `Offset: ${offset}`;
+      });
+    }
   }
 
   runFormula(): void {
@@ -175,7 +184,6 @@ class FormulaEditor extends Mountable {
       const res = instance.eval();
       this.result.update(res.asString());
     } catch (e) {
-      console.error('Error during evaluation:', e);
       this.result.update(
         `Error: ${e instanceof Error ? e.message : String(e)}`,
       );
@@ -238,9 +246,17 @@ class FormulaEditor extends Mountable {
       }
     });
 
+    this.cursorPositionDisplay = document.createElement('div');
+    this.cursorPositionDisplay.style.marginLeft = '15px';
+    this.cursorPositionDisplay.style.fontSize = '0.8rem';
+    this.cursorPositionDisplay.style.color = '#ccc';
+    this.cursorPositionDisplay.style.fontFamily = 'monospace';
+    this.cursorPositionDisplay.textContent = 'Offset: 0';
+
     buttonContainer.appendChild(run);
     buttonContainer.appendChild(save);
     buttonContainer.appendChild(autoRunToggle);
+    buttonContainer.appendChild(this.cursorPositionDisplay);
     this._view.append(buttonContainer);
   }
 

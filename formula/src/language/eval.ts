@@ -12,6 +12,7 @@ import {
   type LiteralExpr,
   type UnaryExpr,
 } from '../ast.js';
+import { stringifySpan } from '../span.js';
 import type { Visitor } from '../visitor.js';
 import {
   AddTrait,
@@ -35,6 +36,15 @@ import {
 import { StringValueImpl } from './core/primitives/string/impl.js';
 import type { Value } from './core/value.js';
 import { Environment } from './environment.js';
+
+export class RefError extends Error {
+  constructor(public ident: Ident) {
+    super(
+      `RefError: '${ident.name}' is not defined at ${stringifySpan(ident.span)}`,
+    );
+    this.name = 'RefError';
+  }
+}
 
 type StackFrame = {
   value: Value;
@@ -119,7 +129,7 @@ export class Evaluator implements Visitor<Value> {
   visitIdent(ident: Ident): Value {
     const val = this._scope.get(ident.name);
     if (!val) {
-      throw new Error(`Identifier '${ident.name}' is not defined.`);
+      throw new RefError(ident);
     }
     return val;
   }
