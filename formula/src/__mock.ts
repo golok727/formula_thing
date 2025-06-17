@@ -1,10 +1,10 @@
 import {
+  type Expr,
+  type BinaryOp,
   BinaryExpr,
   CallExpr,
-  Expr,
   Ident,
   LiteralExpr,
-  type BinaryOp,
 } from './ast.js';
 import { span } from './span.js';
 

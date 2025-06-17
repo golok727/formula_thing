@@ -25,14 +25,11 @@ export class Environment {
   get(name: string): Value | null {
     const variable = this._values.get(name);
     if (variable) {
-      if (typeof variable.value === 'function') {
-        return variable.value(this);
-      } else {
-        return variable.value;
-      }
-    } else {
-      return this._parent?.get(name) ?? null;
+      return typeof variable.value === 'function'
+        ? variable.value(this)
+        : variable.value;
     }
+    return this._parent?.get(name) ?? null;
   }
 
   define(def: EnvDefineConfig<this>): this {
@@ -42,7 +39,7 @@ export class Environment {
         linkname: def.linkname,
         description: def.description,
         override: false,
-        value: new Fn((args) => def.fn(this, args) ?? None, def.linkname),
+        value: new Fn((args) => def.fn(this, args), def.linkname),
       });
     } else if (def.type === 'value') {
       if (!def.override && this._values.has(def.linkname)) {

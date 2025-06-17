@@ -18,5 +18,5 @@ export type FunctionDefinition<Env extends Environment = Environment> = {
   type: 'function';
   linkname: string;
   description?: string;
-  fn: (env: Env, args: Arguments) => Value | void;
+  fn: (env: Env, args: Arguments) => Value;
 };

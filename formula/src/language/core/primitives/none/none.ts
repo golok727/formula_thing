@@ -2,9 +2,6 @@ import { BaseValue, type Value } from '../../value.js';
 
 export class NoneValue extends BaseValue {
   readonly typeHint: string = 'None';
-  constructor() {
-    super();
-  }
 
   asString(): string {
     return 'None';

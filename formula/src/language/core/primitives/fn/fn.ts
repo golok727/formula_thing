@@ -13,7 +13,7 @@ export class Fn extends BaseValue {
     return true;
   }
   asNumber(): number {
-    return NaN;
+    return Number.NaN;
   }
 
   constructor(

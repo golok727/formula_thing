@@ -6,11 +6,12 @@ import {
   Environment,
   Formula,
   type FunctionDefinition,
+  None,
 } from './language/index.js';
 import { FormulaRuntime } from './std/runtime.js';
 import { evaluateFormula } from './utils.js';
 
-let source1 = new MockDataSource({
+const source1 = new MockDataSource({
   Age: {
     '1': 20,
     '2': 11,
@@ -69,6 +70,8 @@ class RowEnvironment extends Environment {
         return new NumberValue(cell);
       case 'boolean':
         return new BooleanValue(cell);
+      default:
+        return None;
     }
   };
 }

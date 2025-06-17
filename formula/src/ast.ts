@@ -12,16 +12,12 @@ export abstract class Expr implements Visit {
     return src.slice(this.span.start, this.span.end);
   }
 
-  toString(_pretty: boolean = false): string {
+  toString(_pretty = false): string {
     return this.visit(new Printer());
   }
 }
 
 export class EmptyExpr extends Expr {
-  constructor(span: SrcSpan) {
-    super(span);
-  }
-
   visit<Result>(visitor: Visitor<Result>): Result {
     return visitor.visitEmptyExpr(this);
   }

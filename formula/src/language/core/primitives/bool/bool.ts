@@ -5,10 +5,6 @@ import { Fn } from '../fn/fn.js';
 export class BooleanValue extends BaseValue {
   readonly typeHint: string = 'Boolean';
 
-  readonly then = new Fn((args) => {
-    return this.value ? args.get(0) : args.get(1);
-  });
-
   constructor(public readonly value: boolean) {
     super();
   }
@@ -33,7 +29,5 @@ export class BooleanValue extends BaseValue {
     return val instanceof BooleanValue;
   }
 
-  static override readonly properties: PropertyAccessorMap<BooleanValue> = {
-    then: (me: BooleanValue) => me.then,
-  };
+  static override readonly properties: PropertyAccessorMap<BooleanValue> = {};
 }
