@@ -1,7 +1,8 @@
 import type { Arguments } from '../fn/arguments.js';
-import { BaseValue, type PropertyAccessorMap } from '../../value.js';
+import { type PropertyAccessorMap } from '../../value.js';
 import { Fn } from '../fn/fn.js';
 import { NumberValue } from '../number/number.js';
+import { BaseValue } from '../base.js';
 
 export class StringValue extends BaseValue {
   readonly typeHint: string = 'String';

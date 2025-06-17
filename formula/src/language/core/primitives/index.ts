@@ -1,3 +1,4 @@
+export * from './base.js';
 export * from './none/index.js';
 export * from './string/index.js';
 export * from './bool/index.js';

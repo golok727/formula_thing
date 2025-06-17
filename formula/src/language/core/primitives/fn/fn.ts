@@ -1,6 +1,7 @@
 import { Arguments } from './arguments.js';
-import { BaseValue, type Value } from '../../value.js';
-import { None } from '../none/index.js';
+import type { Value } from '../../value.js';
+import { None } from '../none/none.js';
+import { BaseValue } from '../base.js';
 
 export class Fn extends BaseValue {
   typeHint: string = 'Fn';

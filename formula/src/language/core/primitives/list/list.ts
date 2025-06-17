@@ -1,9 +1,6 @@
-import {
-  BaseValue,
-  type PropertyAccessorMap,
-  type Value,
-} from '../../value.js';
-import { Fn } from '../fn/index.js';
+import { type PropertyAccessorMap, type Value } from '../../value.js';
+import { BaseValue } from '../base.js';
+import { Fn } from '../fn/fn.js';
 import { NumberValue } from '../number/number.js';
 import { StringValue } from '../string/string.js';
 

@@ -1,4 +1,4 @@
-import type { BooleanValue } from '../primitives/index.js';
+import type { BooleanValue } from '../primitives/bool/bool.js';
 import type { Value } from '../value.js';
 
 export const Ordering = {

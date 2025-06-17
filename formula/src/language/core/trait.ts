@@ -1,10 +1,5 @@
-import type { PropertyAccessorMap, Value } from './value.js';
-
-export type Trait<T> = {
-  readonly id: string;
-  _marker?: T;
-  map<U>(): Trait<U>;
-};
+import type { Trait } from './types.js';
+import type { ValueConstructor } from './value.js';
 
 export function defineTrait<T>(id: string): Trait<T> {
   return {
@@ -12,11 +7,6 @@ export function defineTrait<T>(id: string): Trait<T> {
     _marker: undefined as never,
     map: <U>() => defineTrait<U>(id) as Trait<U>,
   };
-}
-
-export interface ValueConstructor {
-  new (...args: any[]): Value;
-  readonly properties: PropertyAccessorMap<any>;
 }
 
 const traitMap: Map<ValueConstructor, Map<string, any>> = new Map();

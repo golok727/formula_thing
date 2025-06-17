@@ -1,8 +1,8 @@
 import { PropertyAccessorTrait, type PropertyAccessor } from './op/index.js';
-import { None } from './primitives/index.js';
+import { None } from './primitives/none/none.js';
 
-import { addImpl, type ValueConstructor } from './trait.js';
-import type { Value } from './value.js';
+import { addImpl } from './trait.js';
+import type { Value, ValueConstructor } from './value.js';
 
 export function implPropertyAccessor<C extends ValueConstructor>(cstr: C) {
   addImpl(cstr, PropertyAccessorTrait, {

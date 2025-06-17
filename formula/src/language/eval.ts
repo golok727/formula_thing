@@ -32,9 +32,9 @@ import {
   RemTrait,
   StringValue,
   SubTrait,
+  type Value,
 } from './core/index.js';
 import { StringValueImpl } from './core/primitives/string/impl.js';
-import type { Value } from './core/value.js';
 import { Environment } from './environment.js';
 
 export class RefError extends Error {

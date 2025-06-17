@@ -7,8 +7,8 @@ import {
   SubTrait,
 } from '../op/index.js';
 import type { Add, Div, Mul, Neg, Rem, Sub } from '../op/types.js';
-import { addImpl, type ValueConstructor } from '../trait.js';
-import type { Value } from '../value.js';
+import { addImpl } from '../trait.js';
+import type { Value, ValueConstructor } from '../value.js';
 import { NumberValue } from './number/number.js';
 
 export type CoreArithmeticImplementations = Add & Sub & Mul & Div & Rem & Neg;
