@@ -8,7 +8,6 @@ import {
 	LambdaExpr,
 	LetExpr,
 	UnaryExpr,
-	type Expr,
 	type Ident,
 	type LiteralExpr,
 	type MemberExpr,
@@ -83,6 +82,6 @@ export function evaluateFormula(
 	env: Environment = new FormulaRuntime()
 ): Value {
 	const formula = new Formula(source, "Eval").compile();
-	const instance = env.createInstance(formula);
+	const instance = formula.createInstance(env);
 	return instance.eval();
 }

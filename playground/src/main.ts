@@ -169,7 +169,7 @@ class FormulaEditor extends Mountable {
 			return;
 		}
 
-		const instance = this.runtime.createInstance(formula);
+		const instance = formula.createInstance(this.runtime);
 
 		try {
 			const res = instance.eval();

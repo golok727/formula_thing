@@ -6,15 +6,11 @@ import { Fn, None, type Value } from "./core/index.js";
 export class Environment {
 	private _values: Map<string, ValueDefinition> = new Map();
 
-	protected _parent: Environment | null = null;
-
 	get parent(): Environment | null {
 		return this._parent;
 	}
 
-	constructor(parent: Environment | null = null) {
-		this._parent = parent;
-	}
+	constructor(protected _parent: Environment | null = null) {}
 
 	set(name: string, value: Value, override: boolean = false): this {
 		this.define({
@@ -56,27 +52,6 @@ export class Environment {
 		}
 
 		return this;
-	}
-
-	/**
-	 * Create an instance providing this environment:
-	 */
-	createInstance<Env extends Environment>(
-		formula: Formula,
-		env: Env
-	): Instance<Env>;
-	createInstance(formula: Formula): Instance<this>;
-	createInstance(formula: Formula, env?: Environment): Instance<Environment> {
-		env ??= this;
-		let curRoot = env;
-		while (curRoot && curRoot.parent) {
-			if (curRoot === this) {
-				return new Instance(formula, this);
-			}
-			curRoot = curRoot.parent;
-		}
-		curRoot.setParent(this);
-		return new Instance(formula, env);
 	}
 
 	setParent(parent: Environment): this {

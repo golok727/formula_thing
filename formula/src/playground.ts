@@ -92,21 +92,23 @@ rt.define({
 	type: "function",
 	linkname: "now",
 	description: "Returns the current date and time",
-	fn: () => {
+	fn: (runtime) => {
+		console.log(runtime, runtime instanceof FormulaRuntime);
 		return new StringValue(new Date().toDateString());
 	},
 });
 
 // for each database create a new environment
 let sourceEnv = new DataViewFormulaEnvironment(source1);
+sourceEnv.setParent(rt);
 const [formula, error] = new Formula(src, "First formula").compileSafe();
 if (error) {
 	console.error("Compilation errors:", error);
 	throw new Error("Compilation failed");
 }
 // each cell can have its own instance of the formula
-const row1 = rt.createInstance(formula, new RowEnvironment("1", sourceEnv));
-const row2 = rt.createInstance(formula, new RowEnvironment("2", sourceEnv));
+const row1 = formula.createInstance(new RowEnvironment("1", sourceEnv));
+const row2 = formula.createInstance(new RowEnvironment("2", sourceEnv));
 
 console.log(row1.eval().asString());
 console.log(row2.eval().asString());

@@ -103,6 +103,7 @@ const runtime = new FormulaRuntime();
 
 class RowEnv extends Environment {
   constructor(public rowId: string, public dataSource: DataSource) {
+    super(null)
     runtime.define({
       type: "function", 
       fn: (me, args) => {
@@ -115,7 +116,7 @@ class RowEnv extends Environment {
 }
 
 const formula = new Formula(src, "Test").compile();
-const row = runtime.createInstance(formula, new RowEnv(rowId, dataSource));
+const row = formula.createInstance(new RowEnv(rowId, dataSource).setParent(runtime));
 const result = row.eval();
 console.log(result.asString());
 ```
