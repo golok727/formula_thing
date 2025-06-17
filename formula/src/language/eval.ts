@@ -75,11 +75,7 @@ export class Evaluator implements Visitor<Value> {
 			return value;
 		});
 
-		if (expr.body) {
-			return expr.body.visit(local);
-		}
-
-		return None;
+		return expr.body.visit(local);
 	}
 
 	visitConditionalExpr(expr: ConditionalExpr): Value {

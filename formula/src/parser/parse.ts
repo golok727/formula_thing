@@ -16,7 +16,7 @@ import {
 	UnaryOp,
 	type Expr,
 } from "../ast.js";
-import { span } from "../span.js";
+import { span, type SrcSpan } from "../span.js";
 import { Lexer } from "./lexer.js";
 import { Token, TokenKind } from "./token.js";
 
@@ -24,6 +24,13 @@ export class Parser {
 	private tokens: Lexer;
 	private t0: Token | null = null;
 	private t1: Token | null = null;
+
+	static parse(
+		source: string
+	): [result: Expr, error: null] | [result: null, error: unknown] {
+		const parser = new Parser(source);
+		return parser.parse();
+	}
 
 	constructor(public readonly source: string) {
 		this.tokens = new Lexer(source);
@@ -80,34 +87,36 @@ export class Parser {
 		);
 	}
 
-	private _parseParenthesized<T>(parse: () => T): T {
-		this._expectOne(TokenKind.LParen); // consume '('
-		const expr = parse();
-		this._expectOne(TokenKind.RParen); // consume ')'
-		return expr;
+	private _parseParenthesized<T>(parse: () => T): { result: T } & SrcSpan {
+		const start = this._expectOne(TokenKind.LParen).span.start; // consume '('
+		const result = parse();
+		const end = this._expectOne(TokenKind.RParen).span.end; // consume ')'
+		return { result, start, end };
 	}
 
 	private _parseArrayExpr(): ArrayExpr {
-		this._expectOne(TokenKind.LBracket); // consume '['
+		const startSpan = this._expectOne(TokenKind.LBracket).span; // consume '['
 		const elements = this._parseSeriesOf(
 			() => this._parseExpr(),
 			TokenKind.Comma
 		);
-		this._expectOne(TokenKind.RBracket); // consume ']'
-		return new ArrayExpr(elements, span(0, 0));
+		const endSpan = this._expectOne(TokenKind.RBracket).span; // consume ']'
+
+		return new ArrayExpr(elements, span(startSpan.start, endSpan.end));
 	}
 
 	// |((param),)*| expr
 	private _parseLambdaExpr() {
-		const mayBeEmptyParams = this._nextIs(TokenKind.Or);
+		const mayBeEmptyParams = this._nextIs(TokenKind.Or); // check for '||' which is also logical OR
 		let params: Ident[] = [];
+		let start: number;
 
 		if (!mayBeEmptyParams) {
-			this._expectOne(TokenKind.Pipe); // consume '|'
+			start = this._expectOne(TokenKind.Pipe).span.start; // consume '|'
 			params = this._parseSeriesOf(() => this._parseIdent(), TokenKind.Comma);
 			this._expectOne(TokenKind.Pipe); // consume '|'
 		} else {
-			this._expectOne(TokenKind.Or); // consume '||'
+			start = this._expectOne(TokenKind.Or).span.start; // consume '||'
 		}
 
 		const body = this._parseExpr();
@@ -115,21 +124,22 @@ export class Parser {
 			throw new Error("Invalid lambda expression: expected body after '|'");
 		}
 
-		return new LambdaExpr(params, body, span(0, 0)); // todo span
+		return new LambdaExpr(params, body, span(start, body.span.end));
 	}
 
 	/**
 	  expr((args: expr)*,)
 	 */
 	private _parseFnCall(callee: Expr): Expr {
-		const args = this._parseParenthesized(() => {
+		const { result: args, end } = this._parseParenthesized(() => {
 			let argsList = this._parseSeriesOf(() => {
 				return this._parseExpr();
 			}, TokenKind.Comma);
 			return argsList;
 		});
 
-		const fn = new CallExpr(callee, args, span(0, 0));
+		const fn = new CallExpr(callee, args, span(callee.span.start, end));
+
 		return this._tryParsePostFixExpr(fn);
 	}
 	/**
@@ -168,7 +178,7 @@ export class Parser {
 			expr ? (consequent: expr) : (alternate: expr)
 		*/
 	private _parseTernaryExpr(condition: Expr): Expr {
-		this._expectOne(TokenKind.Question); // consume '?'
+		const startSpan = this._expectOne(TokenKind.Question).span; // consume '?'
 		const consequent = this._parseExpr();
 		if (!consequent) {
 			throw new Error("Expected an expression after '?'");
@@ -183,7 +193,7 @@ export class Parser {
 			condition,
 			consequent,
 			alternate,
-			span(0, 0) // todo span
+			span(startSpan.start, alternate.span.end)
 		);
 	}
 
@@ -195,8 +205,8 @@ export class Parser {
 		if (this._nextIs(TokenKind.Ident) && this.t1?.kind === TokenKind.Eq) {
 			const ident = this._expectOne(TokenKind.Ident);
 			this._expectOne(TokenKind.Eq); // consume '='
-			const expr = this._parseExpr();
-			if (!expr) {
+			const value = this._parseExpr();
+			if (!value) {
 				throw new Error(
 					`Expected an expression after '=' in assignment to '${ident.source(
 						this.source
@@ -205,20 +215,20 @@ export class Parser {
 			}
 			return new AssignmentExpr(
 				new Ident(ident.source(this.source), ident.span),
-				expr,
-				span(0, 0) // todo span
+				value,
+				span(ident.span.start, value.span.end)
 			);
 		}
 
 		return null;
 	}
 	/*
-		let ( ((ident = expr)+), (body: expr)? )
+		let ( ((ident = expr)+), (body: expr) )
 	 */
 	private _parseLetExpr(): Expr {
-		this._expectOne(TokenKind.Let); // consume 'let'
+		const start = this._expectOne(TokenKind.Let).span.start; // consume 'let'
 
-		return this._parseParenthesized(() => {
+		const { result, end } = this._parseParenthesized(() => {
 			const bindings = this._parseSeriesOf(() => {
 				return this._tryParseAssignment();
 			}, TokenKind.Comma);
@@ -228,15 +238,28 @@ export class Parser {
 			}
 
 			let body: Expr | null = this._parseExpr();
-			return new LetExpr(bindings, body, span(0, 0));
+
+			if (!body) {
+				throw new Error(
+					`Expected a body expression after bindings in 'let' expression`
+				);
+			}
+
+			return {
+				bindings,
+				body,
+			};
 		});
+
+		return new LetExpr(result.bindings, result.body, span(start, end));
 	}
 	/*
 		if (condition:expr, consequent: expr, alternate: expr)
 	 */
 	private _parseIfExpr(): Expr {
-		this._expectOne(TokenKind.If); // consume 'if'
-		return this._parseParenthesized(() => {
+		const start = this._expectOne(TokenKind.If).span.start; // consume 'if'
+
+		const { result, end } = this._parseParenthesized(() => {
 			const condition = this._parseExpr();
 			if (!condition) {
 				throw new Error("Expected a condition expression after 'if'");
@@ -257,9 +280,19 @@ export class Parser {
 					`Expected an alternate expression after '${sep.source(this.source)}'`
 				);
 			}
-
-			return new ConditionalExpr(condition, consequent, alternate, span(0, 0));
+			return {
+				condition,
+				consequent,
+				alternate,
+			};
 		});
+
+		return new ConditionalExpr(
+			result.condition,
+			result.consequent,
+			result.alternate,
+			span(start, end)
+		);
 	}
 
 	/*
@@ -303,6 +336,11 @@ export class Parser {
 						token.span
 					);
 				}
+				case TokenKind.Boolean: {
+					const token = this._nextToken()!; // consume the literal
+					const value = token.source(this.source) === "true";
+					return new LiteralExpr(value, token.span);
+				}
 				case TokenKind.If: {
 					return this._parseIfExpr();
 				}
@@ -310,13 +348,7 @@ export class Parser {
 					return this._parseLetExpr();
 				}
 				case TokenKind.Ident: {
-					const ident = this._parseIdent();
-					return this._tryParsePostFixExpr(ident);
-				}
-				case TokenKind.Boolean: {
-					const token = this._nextToken()!; // consume the literal
-					const value = token.source(this.source) === "true";
-					return new LiteralExpr(value, token.span);
+					return this._parseIdent();
 				}
 				case TokenKind.LParen: {
 					return this._parseParenthesized(() => {
@@ -325,7 +357,7 @@ export class Parser {
 							throw new Error(`Expected an expression inside parentheses.'`);
 						}
 						return expr;
-					});
+					}).result;
 				}
 				// lambda expr
 				case TokenKind.Pipe:
@@ -343,7 +375,11 @@ export class Parser {
 							`Expected an expression after '${not.source(this.source)}'.`
 						);
 					}
-					return new UnaryExpr(UnaryOp.Not, expr, not.span);
+					return new UnaryExpr(
+						UnaryOp.Not,
+						expr,
+						span(not.span.start, expr.span.end)
+					);
 				}
 				case TokenKind.Minus: {
 					const minus = this._nextToken()!; // consume '-'
@@ -353,7 +389,11 @@ export class Parser {
 							`Expected an expression after '${minus.source(this.source)}'.`
 						);
 					}
-					return new UnaryExpr(UnaryOp.Negate, expr, minus.span);
+					return new UnaryExpr(
+						UnaryOp.Negate,
+						expr,
+						span(minus.span.start, expr.span.end)
+					);
 				}
 				default:
 					return null;
@@ -417,6 +457,13 @@ export class Parser {
 	parse(): [result: Expr, error: null] | [result: null, error: unknown] {
 		try {
 			const res = this._parseExpr();
+			if (this.t0) {
+				throw new Error(
+					`Unexpected token '${this.t0.source(this.source)}' at [${
+						this.t0.span.start
+					}, ${this.t0.span.end}]. Expected end of expression.`
+				);
+			}
 			return [res ?? new EmptyExpr(span(0, 0)), null];
 		} catch (error) {
 			console.error(error);
@@ -484,6 +531,11 @@ function opExprReducer(opTok: Token, exprStack: Expr[]) {
 	const op = binaryOpFromTokenKind(opTok.kind);
 	if (op === null) throw new Error(`invalid binary op token ${opTok.kind}`);
 
-	const expr = new BinaryExpr(left, op, right, span(0, 0));
+	const expr = new BinaryExpr(
+		left,
+		op,
+		right,
+		span(left.span.start, right.span.end)
+	);
 	exprStack.push(expr);
 }

@@ -8,6 +8,10 @@ export abstract class Expr implements Visit {
 
 	abstract visit<Result>(visitor: Visitor<Result>): Result;
 
+	source(src: string): string {
+		return src.slice(this.span.start, this.span.end);
+	}
+
 	toString(_pretty: boolean = false): string {
 		return this.visit(new Printer());
 	}
@@ -98,7 +102,7 @@ export class AssignmentExpr extends Expr {
 export class LetExpr extends Expr {
 	constructor(
 		public readonly bindings: AssignmentExpr[],
-		public readonly body: Expr | null,
+		public readonly body: Expr,
 		span: SrcSpan
 	) {
 		super(span);

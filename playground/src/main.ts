@@ -165,7 +165,7 @@ class FormulaEditor extends Mountable {
 
 		if (error) {
 			console.error("Failed to compile formula:", error);
-			this.result.update(`Error: ${error.message}`);
+			this.result.update(`${error.message}`);
 			return;
 		}
 

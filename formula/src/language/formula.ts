@@ -57,7 +57,7 @@ export class Formula implements Visit {
 		let [root, error] = parser.parse();
 		if (error) {
 			// todo - handle errors properly
-			return [null, new CompilationError(`Parsing error: ${error}`)];
+			return [null, new CompilationError(`ParseError: ${error}`)];
 		}
 		this._root = root;
 		return [this, null];
