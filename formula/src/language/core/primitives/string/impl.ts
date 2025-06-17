@@ -1,4 +1,4 @@
-import { Ordering, type Add, type Eq, type Ord } from '../../op/types.js';
+import { type Add, type Eq, type Ord, Ordering } from '../../op/types.js';
 import type { Value } from '../../value.js';
 import { BooleanValue } from '../bool/bool.js';
 import { NumberValueImpl } from '../number/impl.js';
@@ -21,11 +21,11 @@ export const StringValueImpl: Add & Ord & Eq<StringValue> = {
   eq(me: StringValue, other: Value): BooleanValue {
     if (!(me instanceof StringValue)) {
       throw new Error(
-        `First parameter to StringValue.eq must be a StringValue but got ${other.typeHint}`,
+        `First parameter to StringValue.eq must be a StringValue but got ${other.typeHint}`
       );
     }
     return new BooleanValue(
-      other instanceof StringValue && me.value === other.value,
+      other instanceof StringValue && me.value === other.value
     );
   },
 } as const;

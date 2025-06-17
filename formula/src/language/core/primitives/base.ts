@@ -19,7 +19,7 @@ export abstract class BaseValue implements Value {
     return getImpl<T>(
       this.constructor as ValueConstructor,
       trait,
-      optional as true,
+      optional as true
     );
   }
 
@@ -29,7 +29,7 @@ export abstract class BaseValue implements Value {
     return getImpl<T>(
       this as unknown as ValueConstructor,
       trait,
-      optional as true,
+      optional as true
     );
   }
 

@@ -1,4 +1,4 @@
-import { EqTrait, NotTrait, OrdTrait, type Eq } from '../../op/index.js';
+import { type Eq, EqTrait, NotTrait, OrdTrait } from '../../op/index.js';
 import { implPropertyAccessor } from '../../utils.js';
 import { BoolValueImpl } from '../bool/impl.js';
 import { implCoreArithmetic } from '../common.js';
@@ -10,7 +10,7 @@ implPropertyAccessor(NumberValue);
 
 NumberValue.addImpl(OrdTrait, NumberValueImpl).addImpl<Eq<NumberValue>>(
   EqTrait,
-  NumberValueImpl,
+  NumberValueImpl
 );
 // inherit from boolean
 NumberValue.addImpl(NotTrait, BoolValueImpl);

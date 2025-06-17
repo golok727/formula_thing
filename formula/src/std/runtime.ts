@@ -1,4 +1,3 @@
-import { Environment } from '../language/environment.js';
 import {
   BooleanValue,
   Fn,
@@ -7,8 +6,9 @@ import {
   NumberValue,
   StringValue,
 } from '../language/core/index.js';
+import { Environment } from '../language/environment.js';
 
-const range = new Fn((args) => {
+const range = new Fn(args => {
   if (args.length === 0) {
     return new List([]);
   }
@@ -20,32 +20,32 @@ const range = new Fn((args) => {
     const start = args.get(0).asNumber();
     const end = args.get(1).asNumber();
     return new List(
-      Array.from({ length: end - start }, (_, i) => new NumberValue(i + start)),
+      Array.from({ length: end - start }, (_, i) => new NumberValue(i + start))
     );
   }
   throw new Error('range() function requires either 0, 1, or 2 arguments.');
 }, 'range');
 
-const concat = new Fn((args) => {
-  return new StringValue(args.raw.map((arg) => arg.asString()).join(''));
+const concat = new Fn(args => {
+  return new StringValue(args.raw.map(arg => arg.asString()).join(''));
 }, 'concat');
 
-const type = new Fn((args) => {
+const type = new Fn(args => {
   const arg = args.get(0);
   return new StringValue(arg.typeHint);
 }, 'type');
 
-const toString = new Fn((args) => {
+const toString = new Fn(args => {
   const arg = args.get(0);
   return new StringValue(arg.asString());
 }, 'toString');
 
-const toNumber = new Fn((args) => {
+const toNumber = new Fn(args => {
   const arg = args.get(0);
   return new NumberValue(arg.asNumber());
 }, 'toNumber');
 
-const toBool = new Fn((args) => {
+const toBool = new Fn(args => {
   const arg = args.get(0);
   return new BooleanValue(arg.asBoolean());
 }, 'toBool');

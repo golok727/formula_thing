@@ -3,9 +3,6 @@ import { Cursor } from './cursor.js';
 import { FormulaParseError, ParseErrorKind } from './error.js';
 import { Token, TokenKind, tryGetKeywordFromString } from './token.js';
 
-const NUMBER_VALIDATOR =
-  /^(?:0[xX][0-9a-fA-F]+|0[bB][01]+|0[oO][0-7]+|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?|\d+)$/;
-
 export class Lexer implements Iterable<Token> {
   private chars: Cursor<string>;
 
@@ -72,7 +69,7 @@ export class Lexer implements Iterable<Token> {
       throw new FormulaParseError(
         ParseErrorKind.UnexpectedToken,
         span(start, end),
-        `Unexpected character '${c}' at position ${start}`,
+        `Unexpected character '${c}' at position ${start}`
       );
     }
 
@@ -187,7 +184,7 @@ export class Lexer implements Iterable<Token> {
       throw new FormulaParseError(
         ParseErrorKind.EmptyExponent,
         span(this.offset, this.offset),
-        `Empty exponent part at position ${this.offset}`,
+        `Empty exponent part at position ${this.offset}`
       );
     }
   }
@@ -214,7 +211,7 @@ export class Lexer implements Iterable<Token> {
           throw new FormulaParseError(
             ParseErrorKind.InvalidHexLiteral,
             span(start, this.offset),
-            `Invalid hexadecimal number`,
+            `Invalid hexadecimal number`
           );
         }
       } else if (next === 'b' || next === 'B') {
@@ -223,7 +220,7 @@ export class Lexer implements Iterable<Token> {
           throw new FormulaParseError(
             ParseErrorKind.InvalidHexLiteral,
             span(start, this.offset),
-            `Invalid binary number`,
+            `Invalid binary number`
           );
         }
       } else if (next === 'o' || next === 'O') {
@@ -232,7 +229,7 @@ export class Lexer implements Iterable<Token> {
           throw new FormulaParseError(
             ParseErrorKind.InvalidOctalLiteral,
             span(start, this.offset),
-            `Invalid octal number`,
+            `Invalid octal number`
           );
         }
       } else {
@@ -253,7 +250,7 @@ export class Lexer implements Iterable<Token> {
         throw new FormulaParseError(
           ParseErrorKind.UnterminatedStringLiteral,
           span(start, this.offset),
-          `Unterminated string starting at position ${start}`,
+          `Unterminated string starting at position ${start}`
         );
       }
       if (next === quoteChar) {

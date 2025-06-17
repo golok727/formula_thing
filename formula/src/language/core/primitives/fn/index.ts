@@ -9,7 +9,7 @@ Fn.addImpl(CallTrait, {
   call(me: Value, args: Value[]) {
     if (!(me instanceof Fn)) {
       throw new Error(
-        `First parameter to Fn.call must be a Fn but got ${me.typeHint}`,
+        `First parameter to Fn.call must be a Fn but got ${me.typeHint}`
       );
     }
     return me.call(args);

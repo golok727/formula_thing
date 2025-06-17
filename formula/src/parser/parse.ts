@@ -6,6 +6,7 @@ import {
   CallExpr,
   ConditionalExpr,
   EmptyExpr,
+  type Expr,
   getOpPrecedence,
   Ident,
   LambdaExpr,
@@ -14,15 +15,14 @@ import {
   MemberExpr,
   UnaryExpr,
   UnaryOp,
-  type Expr,
 } from '../ast/index.js';
 import { span, type SrcSpan } from '../span.js';
 import { FormulaParseError, ParseErrorKind } from './error.js';
 import { Lexer } from './lexer.js';
-import { Token, TokenKind } from './token.js';
+import { type Token, TokenKind } from './token.js';
 
 export class Parser {
-  private tokens: Lexer;
+  private readonly tokens: Lexer;
   private t0: Token | null = null;
   private t1: Token | null = null;
 
@@ -46,7 +46,7 @@ export class Parser {
 
   private _parseSeriesOf<T>(
     parse: () => T | null,
-    delim: TokenKind | null,
+    delim: TokenKind | null
   ): T[] {
     const items: T[] = [];
     while (true) {
@@ -99,7 +99,7 @@ export class Parser {
     const startSpan = this._expectOne(TokenKind.LBracket).span; // consume '['
     const elements = this._parseSeriesOf(
       () => this._parseExpr(),
-      TokenKind.Comma,
+      TokenKind.Comma
     );
     const endSpan = this._expectOne(TokenKind.RBracket).span; // consume ']'
 
@@ -130,14 +130,14 @@ export class Parser {
       throw new FormulaParseError(
         ParseErrorKind.EmptyLambda,
         errSpan,
-        `Expected a expression after lambda parameters, but found nothing.`,
+        `Expected a expression after lambda parameters, but found nothing.`
       );
     }
 
     return new LambdaExpr(
       params,
       body,
-      span(paramDelimSpan.start, body.span.end),
+      span(paramDelimSpan.start, body.span.end)
     );
   }
 
@@ -167,7 +167,7 @@ export class Parser {
     let member = new MemberExpr(
       referer,
       property,
-      span(referer.span.start, property.span.end),
+      span(referer.span.start, property.span.end)
     );
 
     return this._tryParsePostFixExpr(member);
@@ -182,7 +182,7 @@ export class Parser {
       throw new FormulaParseError(
         ParseErrorKind.ExpectedIdentifier,
         span(start, start + 1),
-        `Expected an identifier but found '${token?.kind ?? TokenKind.Eof}'`,
+        `Expected an identifier but found '${token?.kind ?? TokenKind.Eof}'`
       );
     }
 
@@ -200,7 +200,7 @@ export class Parser {
       throw new FormulaParseError(
         ParseErrorKind.ExpectedExpression,
         span(startSpan.start, startSpan.start + 1),
-        "Expected an expression after '?' in ternary expression",
+        "Expected an expression after '?' in ternary expression"
       );
     }
     this._expectOne(TokenKind.Colon); // consume ':'
@@ -209,7 +209,7 @@ export class Parser {
       throw new FormulaParseError(
         ParseErrorKind.ExpectedExpression,
         span(startSpan.start, startSpan.start + 1),
-        "Expected an expression after ':' in ternary expression",
+        "Expected an expression after ':' in ternary expression"
       );
     }
 
@@ -217,7 +217,7 @@ export class Parser {
       condition,
       consequent,
       alternate,
-      span(startSpan.start, alternate.span.end),
+      span(startSpan.start, alternate.span.end)
     );
   }
 
@@ -234,14 +234,14 @@ export class Parser {
           ParseErrorKind.ExpectedExpression,
           span(ident.span.end, ident.span.end + 1),
           `Expected an expression after '=' in assignment to '${ident.source(
-            this.source,
-          )}'`,
+            this.source
+          )}'`
         );
       }
       return new AssignmentExpr(
         new Ident(ident.source(this.source), ident.span),
         value,
-        span(ident.span.start, value.span.end),
+        span(ident.span.start, value.span.end)
       );
     }
 
@@ -276,7 +276,7 @@ export class Parser {
         throw new FormulaParseError(
           ParseErrorKind.EmptyLetBindings,
           span(start, start + 1),
-          `Expected at least one binding in 'let' expression`,
+          `Expected at least one binding in 'let' expression`
         );
       }
 
@@ -286,7 +286,7 @@ export class Parser {
         throw new FormulaParseError(
           ParseErrorKind.EmptyLetBody,
           span(start, start + 1),
-          `Expected a body expression after bindings in 'let' expression`,
+          `Expected a body expression after bindings in 'let' expression`
         );
       }
 
@@ -313,7 +313,7 @@ export class Parser {
           TokenKind.If,
           3,
           0,
-          span(start, start + 1),
+          span(start, start + 1)
         );
       }
 
@@ -325,7 +325,7 @@ export class Parser {
           TokenKind.If,
           3,
           1,
-          span(sep.span.end, sep.span.end + 1),
+          span(sep.span.end, sep.span.end + 1)
         );
       }
 
@@ -337,7 +337,7 @@ export class Parser {
           TokenKind.If,
           3,
           2,
-          span(sep.span.end, sep.span.end + 1),
+          span(sep.span.end, sep.span.end + 1)
         );
       }
 
@@ -352,7 +352,7 @@ export class Parser {
       result.condition,
       result.consequent,
       result.alternate,
-      span(start, end),
+      span(start, end)
     );
   }
 
@@ -387,7 +387,7 @@ export class Parser {
             throw new FormulaParseError(
               ParseErrorKind.InvalidNumberLiteral,
               token.span,
-              `Invalid number literal: ${token.source(this.source)}`,
+              `Invalid number literal: ${token.source(this.source)}`
             );
           }
           return new LiteralExpr(value, token.span);
@@ -422,7 +422,7 @@ export class Parser {
                   start: this.source.length,
                   end: this.source.length + 1,
                 },
-                `Expected an expression inside parentheses, but found nothing.`,
+                `Expected an expression inside parentheses, but found nothing.`
               );
             }
             return expr;
@@ -443,13 +443,13 @@ export class Parser {
             throw new FormulaParseError(
               ParseErrorKind.ExpectedExpression,
               not.span,
-              `Expected an expression after '${not.source(this.source)}'.`,
+              `Expected an expression after '${not.source(this.source)}'.`
             );
           }
           return new UnaryExpr(
             UnaryOp.Not,
             expr,
-            span(not.span.start, expr.span.end),
+            span(not.span.start, expr.span.end)
           );
         }
         case TokenKind.Minus: {
@@ -459,13 +459,13 @@ export class Parser {
             throw new FormulaParseError(
               ParseErrorKind.ExpectedExpression,
               minus.span,
-              `Expected an expression after '${minus.source(this.source)}'.`,
+              `Expected an expression after '${minus.source(this.source)}'.`
             );
           }
           return new UnaryExpr(
             UnaryOp.Negate,
             expr,
-            span(minus.span.start, expr.span.end),
+            span(minus.span.start, expr.span.end)
           );
         }
         default:
@@ -505,7 +505,7 @@ export class Parser {
         throw new FormulaParseError(
           ParseErrorKind.ExpectedExpression,
           errLoc,
-          `Expected an expression, but found nothing after operator.`,
+          `Expected an expression, but found nothing after operator.`
         );
       }
 
@@ -522,7 +522,7 @@ export class Parser {
           },
           opStack,
           exprStack,
-          opExprReducer,
+          opExprReducer
         );
       } else {
         break;
@@ -543,7 +543,7 @@ export class Parser {
       throw new FormulaParseError(
         ParseErrorKind.ExpectedEndOfExpression,
         span(this.t0.span.start, this.t0.span.end),
-        `Expected end of expression found '${this.t0.source(this.source)}'`,
+        `Expected end of expression found '${this.t0.source(this.source)}'`
       );
     }
 
@@ -586,7 +586,7 @@ function handleOp(
   nextOp: OpWithPrecedence | null,
   opStack: OpWithPrecedence[],
   exprStack: Expr[],
-  reducer: (op: Token, exprStack: Expr[]) => void,
+  reducer: (op: Token, exprStack: Expr[]) => void
 ): Expr | null {
   let nxtOp = nextOp;
 
@@ -601,7 +601,7 @@ function handleOp(
       if (exprStack.length === 0) return expr;
 
       throw new Error(
-        '@@internal Expression not fully reduced for some reason',
+        '@@internal Expression not fully reduced for some reason'
       );
     }
 
@@ -634,7 +634,7 @@ function opExprReducer(opTok: Token, exprStack: Expr[]) {
 
   if (!left || !right)
     throw new Error(
-      '@@internal Cant reduce expression. required minimum of 2 expr',
+      '@@internal Cant reduce expression. required minimum of 2 expr'
     );
 
   const op = binaryOpFromTokenKind(opTok.kind);
@@ -645,7 +645,7 @@ function opExprReducer(opTok: Token, exprStack: Expr[]) {
     left,
     op,
     right,
-    span(left.span.start, right.span.end),
+    span(left.span.start, right.span.end)
   );
   exprStack.push(expr);
 }

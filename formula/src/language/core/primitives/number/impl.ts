@@ -1,7 +1,7 @@
+import { type Eq, type Ord, Ordering } from '../../op/types.js';
 import type { Value } from '../../value.js';
-import { NumberValue } from './number.js';
 import { BooleanValue } from '../bool/bool.js';
-import { Ordering, type Eq, type Ord } from '../../op/types.js';
+import { NumberValue } from './number.js';
 
 export type NumberImplementations = Ord & Eq<NumberValue>;
 
@@ -14,11 +14,11 @@ export const NumberValueImpl: NumberImplementations = {
   eq(me: NumberValue, other: Value): BooleanValue {
     if (!(me instanceof NumberValue)) {
       throw new Error(
-        `First parameter to NumberValue.eq must be a NumberValue but got ${other.typeHint}`,
+        `First parameter to NumberValue.eq must be a NumberValue but got ${other.typeHint}`
       );
     }
     return new BooleanValue(
-      other instanceof NumberValue && me.value === other.value,
+      other instanceof NumberValue && me.value === other.value
     );
   },
 } as const;

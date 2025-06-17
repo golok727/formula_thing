@@ -1,18 +1,18 @@
-import {
+import type {
   ArrayExpr,
   AssignmentExpr,
   BinaryExpr,
-  BinaryOp,
+  CallExpr,
   ConditionalExpr,
   Ident,
   LambdaExpr,
   LetExpr,
+  LiteralExpr,
   MemberExpr,
-  type CallExpr,
-  type LiteralExpr,
-  type UnaryExpr,
-  type Visitor,
+  UnaryExpr,
+  Visitor,
 } from '../ast/index.js';
+import { BinaryOp } from '../ast/index.js';
 import { stringifySpan } from '../span.js';
 import {
   AddTrait,
@@ -95,12 +95,12 @@ export class Evaluator implements Visitor<Value> {
   visitLambdaExpr(expr: LambdaExpr): Value {
     // capture the current scope upon creation of the lambda
     const capture = this._capture();
-    return new Fn((args) => {
+    return new Fn(args => {
       // local variables for this lambda
       const local = capture._capture();
       const env = local._scope;
       expr.params.forEach((param, ix) =>
-        env.set(param.name, args.get(ix), true),
+        env.set(param.name, args.get(ix), true)
       );
       return expr.body.visit(local);
     });
@@ -132,7 +132,7 @@ export class Evaluator implements Visitor<Value> {
   }
 
   visitArrayExpr(expr: ArrayExpr): Value {
-    const items = expr.elements.map((el) => el.visit(this));
+    const items = expr.elements.map(el => el.visit(this));
     return new List(items);
   }
 
@@ -217,7 +217,7 @@ export class Evaluator implements Visitor<Value> {
 
   visitCallExpr(expr: CallExpr): Value {
     const callee = expr.callee.visit(this);
-    const args = expr.args.map((arg) => arg.visit(this));
+    const args = expr.args.map(arg => arg.visit(this));
 
     const callable = callee.getImpl(CallTrait, true);
 
@@ -225,7 +225,7 @@ export class Evaluator implements Visitor<Value> {
       throw new Error(
         `'${expr.callee.toString()}' (type: ${
           callee.typeHint
-        }) is not a function`,
+        }) is not a function`
       );
     }
 

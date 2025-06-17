@@ -1,8 +1,8 @@
-import type { Arguments } from '../fn/arguments.js';
 import { type PropertyAccessorMap } from '../../value.js';
+import { BaseValue } from '../base.js';
+import type { Arguments } from '../fn/arguments.js';
 import { Fn } from '../fn/fn.js';
 import { NumberValue } from '../number/number.js';
-import { BaseValue } from '../base.js';
 
 export class StringValue extends BaseValue {
   readonly typeHint: string = 'String';
@@ -20,19 +20,19 @@ export class StringValue extends BaseValue {
     return new StringValue(
       this.value.slice(
         start.asNumber(),
-        end.isNone() ? undefined : end.asNumber(),
-      ),
+        end.isNone() ? undefined : end.asNumber()
+      )
     );
   }, 'slice');
 
   readonly upper = new Fn(
     () => new StringValue(this.value.toUpperCase()),
-    'upper',
+    'upper'
   );
 
   readonly lower = new Fn(
     () => new StringValue(this.value.toLowerCase()),
-    'lower',
+    'lower'
   );
 
   constructor(public readonly value: string) {

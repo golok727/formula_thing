@@ -1,6 +1,5 @@
-import { PropertyAccessorTrait, type PropertyAccessor } from './op/index.js';
+import { type PropertyAccessor, PropertyAccessorTrait } from './op/index.js';
 import { None } from './primitives/none/none.js';
-
 import { addImpl } from './trait.js';
 import type { Value, ValueConstructor } from './value.js';
 

@@ -11,7 +11,7 @@ export class List extends BaseValue {
     super();
   }
 
-  concat = new Fn((args) => {
+  concat = new Fn(args => {
     const otherList = args.get(0);
     if (!List.is(otherList)) {
       throw new Error('First argument to List.concat must be a List');
@@ -19,7 +19,7 @@ export class List extends BaseValue {
     return new List([...this.items, ...otherList.items]);
   }, 'concat');
 
-  map = new Fn((args) => {
+  map = new Fn(args => {
     const mapFn = args.get(0);
 
     // todo use trait
@@ -28,11 +28,11 @@ export class List extends BaseValue {
     }
 
     return new List(
-      this.items.map((item, i) => mapFn.call([item, new NumberValue(i)])),
+      this.items.map((item, i) => mapFn.call([item, new NumberValue(i)]))
     );
   });
 
-  filter = new Fn((args) => {
+  filter = new Fn(args => {
     const filterFn = args.get(0);
 
     // todo use trait
@@ -41,12 +41,12 @@ export class List extends BaseValue {
     }
     return new List(
       this.items.filter((item, i) =>
-        filterFn.call([item, new NumberValue(i)]).asBoolean(),
-      ),
+        filterFn.call([item, new NumberValue(i)]).asBoolean()
+      )
     );
   }, 'filter');
 
-  fold = new Fn((args) => {
+  fold = new Fn(args => {
     const foldFn = args.get(0);
     const initial = args.get(1);
 
@@ -56,15 +56,15 @@ export class List extends BaseValue {
     }
     return this.items.reduce(
       (acc, item, i) => foldFn.call([acc, item, new NumberValue(i)]),
-      initial,
+      initial
     );
   }, 'fold');
 
-  join = new Fn((args) => {
+  join = new Fn(args => {
     const separator = args.get(0);
 
     return new StringValue(
-      this.items.join(separator.isNone() ? '' : separator.asString()),
+      this.items.join(separator.isNone() ? '' : separator.asString())
     );
   }, 'join');
 
@@ -81,12 +81,12 @@ export class List extends BaseValue {
   }
 
   static override readonly properties: PropertyAccessorMap<List> = {
-    len: (me) => new NumberValue(me.items.length),
-    join: (me) => me.join,
-    map: (me) => me.map,
-    filter: (me) => me.filter,
-    fold: (me) => me.fold,
-    concat: (me) => me.concat,
+    len: me => new NumberValue(me.items.length),
+    join: me => me.join,
+    map: me => me.map,
+    filter: me => me.filter,
+    fold: me => me.fold,
+    concat: me => me.concat,
   };
 
   static override is(val: unknown): val is List {

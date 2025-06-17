@@ -1,4 +1,4 @@
-import { Fn, type Value, Arguments } from './core/index.js';
+import { type Arguments, Fn, type Value } from './core/index.js';
 
 const NAME_VALIDATOR = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
@@ -27,7 +27,7 @@ function validateName(name: string): void {
   }
 }
 export class Environment {
-  private _values: Map<string, ValueDefinition> = new Map();
+  private readonly _values: Map<string, ValueDefinition> = new Map();
 
   get parent(): Environment | null {
     return this._parent;
@@ -62,7 +62,7 @@ export class Environment {
         linkname: def.linkname,
         description: def.description,
         override: false,
-        value: new Fn((args) => def.fn(this, args), def.linkname),
+        value: new Fn(args => def.fn(this, args), def.linkname),
       });
     } else if (def.type === 'value') {
       validateName(def.linkname);

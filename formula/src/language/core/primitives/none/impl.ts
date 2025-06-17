@@ -7,7 +7,7 @@ export const NoneValueImpl: Eq<NoneValue> = {
   eq(me: NoneValue, other: Value): BooleanValue {
     if (!(me instanceof NoneValue)) {
       throw new Error(
-        `First parameter to BooleanValue.eq must be a BooleanValue but got ${other.typeHint}`,
+        `First parameter to BooleanValue.eq must be a BooleanValue but got ${other.typeHint}`
       );
     }
     return new BooleanValue(other instanceof NoneValue);

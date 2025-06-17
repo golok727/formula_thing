@@ -1,7 +1,7 @@
-import { Arguments } from './arguments.js';
 import type { Value } from '../../value.js';
-import { None } from '../none/none.js';
 import { BaseValue } from '../base.js';
+import { None } from '../none/none.js';
+import { Arguments } from './arguments.js';
 
 export class Fn extends BaseValue {
   typeHint: string = 'Fn';
@@ -19,7 +19,7 @@ export class Fn extends BaseValue {
 
   constructor(
     public readonly fn: (args: Arguments) => Value,
-    public readonly name = 'anonymous',
+    public readonly name = 'anonymous'
   ) {
     super();
   }

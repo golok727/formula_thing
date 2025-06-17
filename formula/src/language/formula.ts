@@ -1,7 +1,7 @@
-import { FormulaPrinter } from './../ast/index.js';
 import type { Expr, Visit, Visitor } from '../ast/index.js';
 import { FormulaParseError } from '../parser/error.js';
 import { Parser } from '../parser/parse.js';
+import { FormulaPrinter } from './../ast/index.js';
 
 export class CompilationError extends Error {
   constructor(message: string) {
@@ -15,7 +15,7 @@ export class Formula implements Visit {
 
   constructor(
     public readonly source: string,
-    public readonly name: string = 'Unnamed formula',
+    public readonly name: string = 'Unnamed formula'
   ) {}
 
   visit<Result = unknown>(visitor: Visitor<Result>): Result {
@@ -50,7 +50,7 @@ export class Formula implements Visit {
         return [
           null,
           new CompilationError(
-            `ParseError: ${e.message} at [${e.span.start}:${e.span.end}]`,
+            `ParseError: ${e.message} at [${e.span.start}:${e.span.end}]`
           ),
         ];
       }

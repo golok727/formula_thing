@@ -1,9 +1,9 @@
-import { BooleanValue } from './bool.js';
-import { BoolValueImpl } from './impl.js';
-import { NumberValueImpl } from '../number/impl.js';
+import { type Eq, EqTrait, NotTrait, OrdTrait } from '../../op/index.js';
 import { implPropertyAccessor } from '../../utils.js';
 import { implCoreArithmetic } from '../common.js';
-import { EqTrait, NotTrait, OrdTrait, type Eq } from '../../op/index.js';
+import { NumberValueImpl } from '../number/impl.js';
+import { BooleanValue } from './bool.js';
+import { BoolValueImpl } from './impl.js';
 
 BooleanValue.addImpl<Eq<BooleanValue>>(EqTrait, BoolValueImpl)
   .addImpl(NotTrait, BoolValueImpl)
@@ -12,5 +12,5 @@ BooleanValue.addImpl<Eq<BooleanValue>>(EqTrait, BoolValueImpl)
 implCoreArithmetic(BooleanValue);
 implPropertyAccessor(BooleanValue);
 
-export * from './impl.js';
 export * from './bool.js';
+export * from './impl.js';

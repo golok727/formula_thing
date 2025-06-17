@@ -11,12 +11,12 @@ export const BoolValueImpl: BoolImplementations = {
   eq(me: BooleanValue, other: Value): BooleanValue {
     if (!(me instanceof BooleanValue)) {
       throw new Error(
-        `First parameter to BooleanValue.eq must be a BooleanValue but got ${other.typeHint}`,
+        `First parameter to BooleanValue.eq must be a BooleanValue but got ${other.typeHint}`
       );
     }
 
     return new BooleanValue(
-      other instanceof BooleanValue && me.value === other.value,
+      other instanceof BooleanValue && me.value === other.value
     );
   },
 } as const;

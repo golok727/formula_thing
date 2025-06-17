@@ -19,7 +19,7 @@ export class FormulaPrinter implements Visitor<string> {
   }
 
   visitLetExpr(expr: LetExpr): string {
-    const bindings = expr.bindings.map((b) => b.visit(this)).join(', ');
+    const bindings = expr.bindings.map(b => b.visit(this)).join(', ');
     let body = '';
     if (expr.body) {
       body = `,${expr.body.visit(this)}`;
@@ -33,12 +33,12 @@ export class FormulaPrinter implements Visitor<string> {
 
   visitConditionalExpr(expr: ConditionalExpr): string {
     return `${expr.condition.visit(this)} ? ${expr.consequent.visit(
-      this,
+      this
     )} : ${expr.alternate.visit(this)}`;
   }
 
   visitLambdaExpr(expr: LambdaExpr): string {
-    const params = expr.params.map((p) => p.visit(this)).join(', ');
+    const params = expr.params.map(p => p.visit(this)).join(', ');
     const body = expr.body.visit(this);
     return `|${params}| ${body}`;
   }
@@ -53,19 +53,19 @@ export class FormulaPrinter implements Visitor<string> {
     return expr.name;
   }
   visitArrayExpr(expr: ArrayExpr): string {
-    const elements = expr.elements.map((el) => el.visit(this)).join(', ');
+    const elements = expr.elements.map(el => el.visit(this)).join(', ');
     return `[${elements}]`;
   }
   visitBinaryExpr(expr: BinaryExpr): string {
     return `${expr.left.visit(this)} ${expr.operator} ${expr.right.visit(
-      this,
+      this
     )}`;
   }
   visitUnaryExpr(expr: UnaryExpr): string {
     return `${expr.operator}${expr.operand.visit(this)}`;
   }
   visitCallExpr(expr: CallExpr): string {
-    const args = expr.args.map((arg) => arg.visit(this)).join(', ');
+    const args = expr.args.map(arg => arg.visit(this)).join(', ');
     return `${expr.callee.visit(this)}(${args})`;
   }
   visitMemberExpr(expr: MemberExpr): string {

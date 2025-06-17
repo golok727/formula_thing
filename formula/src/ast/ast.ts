@@ -23,7 +23,7 @@ export class EmptyExpr extends Expr {
 export class ArrayExpr extends Expr {
   constructor(
     public readonly elements: Expr[],
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -35,7 +35,7 @@ export class ArrayExpr extends Expr {
 export class LiteralExpr extends Expr {
   constructor(
     public readonly value: string | number | boolean,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -48,7 +48,7 @@ export class LiteralExpr extends Expr {
 export class Ident extends Expr {
   constructor(
     public readonly name: string,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -63,7 +63,7 @@ export class BinaryExpr extends Expr {
     public readonly left: Expr,
     public readonly operator: BinaryOp,
     public readonly right: Expr,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -77,7 +77,7 @@ export class UnaryExpr extends Expr {
   constructor(
     public readonly operator: UnaryOp,
     public readonly operand: Expr,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -91,7 +91,7 @@ export class AssignmentExpr extends Expr {
   constructor(
     public readonly target: Ident,
     public readonly value: Expr,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -105,7 +105,7 @@ export class LetExpr extends Expr {
   constructor(
     public readonly bindings: AssignmentExpr[],
     public readonly body: Expr,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -120,7 +120,7 @@ export class ConditionalExpr extends Expr {
     public readonly condition: Expr,
     public readonly consequent: Expr,
     public readonly alternate: Expr,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -134,7 +134,7 @@ export class LambdaExpr extends Expr {
   constructor(
     public readonly params: Ident[],
     public readonly body: Expr,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -148,7 +148,7 @@ export class CallExpr extends Expr {
   constructor(
     public readonly callee: Expr,
     public readonly args: Expr[],
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }
@@ -162,7 +162,7 @@ export class MemberExpr extends Expr {
   constructor(
     public readonly referer: Expr,
     public readonly property: Ident,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     super(span);
   }

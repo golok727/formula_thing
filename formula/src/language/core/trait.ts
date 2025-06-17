@@ -13,17 +13,17 @@ const traitMap: Map<ValueConstructor, Map<string, any>> = new Map();
 
 export function getImpl<T>(
   ctor: ValueConstructor,
-  trait: Trait<T>,
+  trait: Trait<T>
 ): Readonly<T>;
 export function getImpl<T>(
   ctor: ValueConstructor,
   trait: Trait<T>,
-  optional: true,
+  optional: true
 ): Readonly<T> | null;
 export function getImpl<T>(
   ctor: ValueConstructor,
   trait: Trait<T>,
-  optional?: boolean,
+  optional?: boolean
 ): Readonly<T> | null {
   const implMap = traitMap.get(ctor);
 
@@ -40,7 +40,7 @@ export function addImpl<T>(
   ctor: ValueConstructor,
   trait: Trait<T>,
   impl: T,
-  replace = false,
+  replace = false
 ): void {
   if (!traitMap.has(ctor)) {
     traitMap.set(ctor, new Map());

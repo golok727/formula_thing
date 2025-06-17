@@ -62,7 +62,7 @@ export class Token {
   constructor(
     public readonly kind: TokenKind,
     public readonly span: SrcSpan,
-    public readonly value: string | number | boolean | undefined = undefined,
+    public readonly value: string | number | boolean | undefined = undefined
   ) {}
 
   source(src: string): string {

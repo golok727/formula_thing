@@ -26,7 +26,7 @@ export class FormulaParseError extends Error {
   constructor(
     public readonly kind: ParseErrorKind,
     public span: SrcSpan,
-    message: string = '',
+    message: string = ''
   ) {
     super(message, { cause: kind });
   }
@@ -35,12 +35,12 @@ export class FormulaParseError extends Error {
     callee: string,
     required: number,
     got: number,
-    span: SrcSpan,
+    span: SrcSpan
   ) {
     return new FormulaParseError(
       ParseErrorKind.MissingArguments,
       span,
-      `Missing arguments for '${callee}': expected ${required}, got ${got}`,
+      `Missing arguments for '${callee}': expected ${required}, got ${got}`
     );
   }
 
@@ -48,7 +48,7 @@ export class FormulaParseError extends Error {
     return new FormulaParseError(
       ParseErrorKind.ExpectedToken,
       span,
-      `Expected '${expectedKind}'`,
+      `Expected '${expectedKind}'`
     );
   }
 }

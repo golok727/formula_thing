@@ -1,15 +1,15 @@
-import { implCoreArithmetic } from '../common.js';
-import { NoneValue } from './none.js';
-import { NoneValueImpl } from './impl.js';
-import { BoolValueImpl } from '../bool/impl.js';
-import { NumberValueImpl } from '../number/impl.js';
-import type { Eq } from '../../op/types.js';
 import {
   EqTrait,
   NotTrait,
   OrdTrait,
   PropertyAccessorTrait,
 } from '../../op/index.js';
+import type { Eq } from '../../op/types.js';
+import { BoolValueImpl } from '../bool/impl.js';
+import { implCoreArithmetic } from '../common.js';
+import { NumberValueImpl } from '../number/impl.js';
+import { NoneValueImpl } from './impl.js';
+import { NoneValue } from './none.js';
 
 implCoreArithmetic(NoneValue);
 

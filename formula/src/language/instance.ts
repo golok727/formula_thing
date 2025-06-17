@@ -1,14 +1,13 @@
-import type { Environment, EnvDefineConfig } from './environment.js';
+import type { EnvDefineConfig, Environment } from './environment.js';
+import { Evaluator } from './eval.js';
 import type { Formula } from './formula.js';
 
-import { Evaluator } from './eval.js';
-
 export class Instance<Env extends Environment = Environment> {
-  private _evaluator: Evaluator;
+  private readonly _evaluator: Evaluator;
 
   constructor(
     public readonly formula: Formula,
-    public readonly environment: Env,
+    public readonly environment: Env
   ) {
     if (!formula.isCompiled()) {
       throw new Error('Formula must be compiled before creating an instance.');

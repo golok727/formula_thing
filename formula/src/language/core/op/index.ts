@@ -24,7 +24,7 @@ export const NegTrait = defineTrait<Neg>('_core_NegTrait');
 export const NotTrait = defineTrait<Not>('_core_NotTrait');
 export const CallTrait = defineTrait<Call>('_core_CallTrait');
 export const PropertyAccessorTrait = defineTrait<PropertyAccessor>(
-  '_core_PropertyAccessorTrait',
+  '_core_PropertyAccessorTrait'
 );
 
 export * from './types.js';

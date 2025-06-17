@@ -1,9 +1,9 @@
 import {
   AddTrait,
+  type Eq,
   EqTrait,
   NotTrait,
   OrdTrait,
-  type Eq,
 } from '../../op/index.js';
 import { implPropertyAccessor } from '../../utils.js';
 import { BoolValueImpl } from '../bool/impl.js';
