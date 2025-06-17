@@ -94,6 +94,9 @@ export class Parser {
 		return { result, start, end };
 	}
 
+	/*
+		 [(expr)? (, expr)*] // Array literal
+	*/
 	private _parseArrayExpr(): ArrayExpr {
 		const startSpan = this._expectOne(TokenKind.LBracket).span; // consume '['
 		const elements = this._parseSeriesOf(
@@ -105,7 +108,10 @@ export class Parser {
 		return new ArrayExpr(elements, span(startSpan.start, endSpan.end));
 	}
 
-	// |((param),)*| expr
+	/*
+		| (param) (, param)* | body-expr     // Regular lambda with parameters
+		|| body-expr                         // Lambda with empty parameter list
+	*/
 	private _parseLambdaExpr() {
 		const mayBeEmptyParams = this._nextIs(TokenKind.Or); // check for '||' which is also logical OR
 		let params: Ident[] = [];
@@ -199,7 +205,6 @@ export class Parser {
 
 	/*
 		ident = expr
-		ident = expr, ident = expr
 	*/
 	private _tryParseAssignment(): AssignmentExpr | null {
 		if (this._nextIs(TokenKind.Ident) && this.t1?.kind === TokenKind.Eq) {
@@ -222,8 +227,22 @@ export class Parser {
 
 		return null;
 	}
-	/*
-		let ( ((ident = expr)+), (body: expr) )
+	/**
+	 `let ( (ident = expr) (, (ident = expr))* (, )? body-expr )`
+
+	 * Parses a let expression with the syntax:
+	 * let(binding1 = expr1, binding2 = expr2, ..., bodyExpr)
+	 *
+	 * Where:
+	 * - Each binding assigns a value to an identifier
+	 * - Multiple bindings are separated by commas
+	 * - The final expression is the body that can reference the bound variables
+	 * - The comma between the last binding and body is optional
+	 *
+	 * Examples:
+	 *   let(x = 10, y = 20, x + y)
+	 *   let(x = 10, y = 20 x + y)
+	 *   let(x = 10 x * 2)
 	 */
 	private _parseLetExpr(): Expr {
 		const start = this._expectOne(TokenKind.Let).span.start; // consume 'let'
